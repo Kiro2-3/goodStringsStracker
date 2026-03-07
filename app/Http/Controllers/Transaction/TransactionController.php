@@ -16,12 +16,34 @@ use Illuminate\Support\Facades\Auth;
 class TransactionController extends Controller
 {
     // 1. Show the Dashboard with all transactions and summary
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
         
-        $transactions = $user->transactions()->orderBy('entry_date', 'desc')->get();
+        // Start building the query
+        $query = $user->transactions();
         
+        // Apply filters
+        if ($request->filled('category')) {
+            $query->where('category', $request->category);
+        }
+        
+        if ($request->filled('type')) {
+            $query->where('type', $request->type);
+        }
+        
+        if ($request->filled('date_from')) {
+            $query->where('entry_date', '>=', $request->date_from);
+        }
+        
+        if ($request->filled('date_to')) {
+            $query->where('entry_date', '<=', $request->date_to);
+        }
+        
+        $transactions = $query->orderBy('entry_date', 'desc')->get();
+        
+        // For summary, we might want to show filtered or total summary
+        // Let's show total summary always, but filtered transactions
         $totalIncome = $user->transactions()->where('type', 'income')->sum('amount');
         $totalExpense = $user->transactions()->where('type', 'expense')->sum('amount');
 
@@ -55,6 +77,7 @@ class TransactionController extends Controller
             'categories' => $categories,
             'expenseTotals' => $expenseTotals,
             'incomeTotals' => $incomeTotals,
+            'filters' => $request->only(['category', 'type', 'date_from', 'date_to']),
         ]);
     }
 

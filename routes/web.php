@@ -27,6 +27,10 @@ Route::get('/dashboard', [TransactionController::class, 'index'])
     ->name('dashboard');
 
 Route::middleware('auth')->group(function () {
+    // Add Transaction page
+    Route::get('/transactions/add', function () {
+        return Inertia::render('AddTransaction');
+    })->name('transactions.add');
     // Transaction routes: store (create), show (display edit form), update (save changes), and delete
     Route::post('/transactions', [TransactionController::class, 'store'])->name('transactions.store');
     // Show the edit form for a specific transaction

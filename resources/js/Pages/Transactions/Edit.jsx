@@ -72,7 +72,7 @@ export default function Edit({ auth, transaction }) {
                                     <InputLabel value="Type" htmlFor="type" />
                                     <select
                                         id="type"
-                                        className="select select-bordered w-full"
+                                        className="select select-bordered w-full text-black bg-white"
                                         value={data.type}
                                         onChange={(e) => setData('type', e.target.value)}
                                     >
@@ -90,7 +90,7 @@ export default function Edit({ auth, transaction }) {
                                     <InputLabel value="Category" htmlFor="category" />
                                     <select
                                         id="category"
-                                        className="select select-bordered w-full"
+                                        className="select select-bordered w-full text-black bg-white"
                                         value={data.category}
                                         onChange={(e) => setData('category', e.target.value)}
                                     >
@@ -113,7 +113,7 @@ export default function Edit({ auth, transaction }) {
                                     <input
                                         id="entry_date"
                                         type="date"
-                                        className="input input-bordered w-full"
+                                        className="input input-bordered w-full text-black bg-white"
                                         value={data.entry_date}
                                         onChange={(e) => setData('entry_date', e.target.value)}
                                     />
