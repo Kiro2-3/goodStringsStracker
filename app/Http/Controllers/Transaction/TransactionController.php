@@ -30,6 +30,19 @@ class TransactionController extends Controller
             $query->where('entry_date', '<=', $request->input('date_to'));
         }
 
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+
+            $query->where(function ($q) use ($search) {
+                $q->where('description', 'like', "%{$search}%")
+                    ->orWhere('category', 'like', "%{$search}%");
+
+                if (is_numeric($search)) {
+                    $q->orWhere('amount', (float) $search);
+                }
+            });
+        }
+
         $transactions = $query->paginate(10)->withQueryString();
 
         // Get all categories for filter dropdown
@@ -38,7 +51,7 @@ class TransactionController extends Controller
         return Inertia::render('RecentTransactions', [
             'auth' => ['user' => $user],
             'transactions' => $transactions,
-            'filters' => $request->only(['type', 'category', 'date_from', 'date_to']),
+            'filters' => $request->only(['search', 'type', 'category', 'date_from', 'date_to']),
             'categories' => $categories,
         ]);
     }

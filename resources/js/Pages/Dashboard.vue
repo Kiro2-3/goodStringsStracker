@@ -241,6 +241,16 @@
           <div v-else class="bg-white rounded-xl shadow-sm overflow-hidden">
             <!-- Filters -->
             <div class="p-4 border-b flex flex-col md:flex-row gap-4 items-stretch md:items-end">
+              <div class="flex flex-col gap-1 w-full md:flex-1">
+                <label class="font-semibold text-gray-700 mb-1" for="tab-filter-search">Search</label>
+                <input
+                  id="tab-filter-search"
+                  type="text"
+                  v-model="filters.search"
+                  placeholder="Search description or category"
+                  class="rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-gray-800 focus:border-blue-400 focus:ring-blue-400 text-sm"
+                />
+              </div>
               <div class="flex flex-col gap-1 w-full md:w-40">
                 <label class="font-semibold text-gray-700 mb-1" for="filter-type">Type</label>
                 <select id="filter-type" v-model="filters.type" class="rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-gray-800 focus:border-blue-400 focus:ring-blue-400 text-sm">
