@@ -107,11 +107,12 @@
           </div>
 
           <!-- Table -->
-          <div class="overflow-x-auto">
+          <div class="overflow-x-auto max-h-[28rem] overflow-y-auto">
             <table class="w-full text-left">
               <thead class="bg-gray-50 border-b">
                 <tr>
                   <th class="p-4">Date</th>
+                  <th class="p-4">Description</th>
                   <th class="p-4">Category</th>
                   <th class="p-4">Amount</th>
                   <th class="p-4">Type</th>
@@ -121,6 +122,7 @@
               <tbody>
                 <tr v-for="t in transactions.data" :key="t.id" class="border-b hover:bg-gray-50">
                   <td class="p-4">{{ t.entry_date }}</td>
+                  <td class="p-4">{{ t.description }}</td>
                   <td class="p-4">{{ t.category }}</td>
                   <td
                     class="p-4 font-semibold"

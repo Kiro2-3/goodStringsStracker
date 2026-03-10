@@ -120,7 +120,7 @@ class TransactionController extends Controller
 
         Auth::user()->transactions()->create($validated);
 
-        return redirect()->back();
+        return redirect()->route('dashboard')->with('success', 'Successfully added transaction');
     }
 
     // 3. Update a Transaction
@@ -151,6 +151,7 @@ class TransactionController extends Controller
         }
 
         $transaction->delete();
-        return redirect()->back();
+
+        return redirect()->back()->with('success', 'Successfully deleted transaction');
     }
 }

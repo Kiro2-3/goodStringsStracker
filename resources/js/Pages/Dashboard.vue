@@ -11,14 +11,14 @@
         
         <button
           :class="[tab === 'dashboard' ? 'bg-gray-900 text-white shadow' : 'bg-white text-gray-700 hover:bg-gray-100', 'rounded-lg px-4 py-2 font-medium transition']"
-          @click="tab = 'dashboard'"
+          @click="selectTab('dashboard')"
         >
           Dashboard
         </button>
         
         <button
           :class="[tab === 'transactions' ? 'bg-gray-900 text-white shadow' : 'bg-white text-gray-700 hover:bg-gray-100', 'rounded-lg px-4 py-2 font-medium transition']"
-          @click="tab = 'transactions'"
+          @click="selectTab('transactions')"
         >
           Recent Transactions
         </button>
@@ -40,7 +40,51 @@
 
       <main class="flex-1 space-y-10 px-4 md:px-12 py-8 w-full">
         <template v-if="tab === 'dashboard'">
-          <div class="space-y-8">
+          <div v-if="tabLoading.dashboard" class="space-y-8 animate-pulse">
+            <!-- Summary Cards Skeleton -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
+              <div class="bg-white rounded-2xl shadow p-8 border border-gray-100 w-full">
+                <div class="h-4 bg-gray-200 rounded w-1/3 mb-4"></div>
+                <div class="h-8 bg-gray-200 rounded w-1/2"></div>
+              </div>
+              <div class="bg-white rounded-2xl shadow p-8 border border-gray-100 w-full">
+                <div class="h-4 bg-gray-200 rounded w-1/3 mb-4"></div>
+                <div class="h-8 bg-gray-200 rounded w-1/2"></div>
+              </div>
+              <div class="bg-white rounded-2xl shadow p-8 border border-gray-100 w-full">
+                <div class="h-4 bg-gray-200 rounded w-1/3 mb-4"></div>
+                <div class="h-8 bg-gray-200 rounded w-1/2"></div>
+              </div>
+            </div>
+
+            <!-- Chart Filters Skeleton -->
+            <div class="bg-white rounded-2xl shadow border border-gray-100 mb-8 w-full p-6">
+              <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2">
+                <div class="h-5 bg-gray-200 rounded w-32"></div>
+                <div class="h-4 bg-gray-200 rounded w-16"></div>
+              </div>
+              <div class="flex flex-col sm:flex-row flex-wrap gap-4 items-stretch">
+                <div class="h-10 bg-gray-200 rounded w-full sm:w-40"></div>
+                <div class="h-10 bg-gray-200 rounded w-full sm:w-40"></div>
+                <div class="h-10 bg-gray-200 rounded w-full sm:w-40"></div>
+                <div class="h-10 bg-gray-200 rounded w-full sm:w-40"></div>
+              </div>
+            </div>
+
+            <!-- Charts Skeleton -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
+              <div class="bg-white rounded-2xl shadow border border-gray-100 h-96 p-8 w-full flex flex-col gap-4">
+                <div class="h-5 bg-gray-200 rounded w-40"></div>
+                <div class="flex-1 bg-gray-100 rounded"></div>
+              </div>
+              <div class="bg-white rounded-2xl shadow border border-gray-100 h-96 p-8 w-full flex flex-col gap-4">
+                <div class="h-5 bg-gray-200 rounded w-40"></div>
+                <div class="flex-1 bg-gray-100 rounded"></div>
+              </div>
+            </div>
+          </div>
+
+          <div v-else class="space-y-8">
             <!-- Summary Cards -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
               <div class="bg-white rounded-2xl shadow p-8 flex flex-col items-center border border-gray-100">
@@ -148,7 +192,41 @@
         </template>
 
         <template v-else-if="tab === 'transactions'">
-          <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+          <div v-if="tabLoading.transactions" class="bg-white rounded-xl shadow-sm overflow-hidden animate-pulse">
+            <div class="p-4 border-b flex flex-col md:flex-row gap-4 items-stretch md:items-end">
+              <div class="h-8 bg-gray-200 rounded w-full md:w-40"></div>
+              <div class="h-8 bg-gray-200 rounded w-full md:w-40"></div>
+              <div class="h-8 bg-gray-200 rounded w-full md:w-40"></div>
+              <div class="h-8 bg-gray-200 rounded w-full md:w-40"></div>
+              <div class="h-8 bg-gray-200 rounded w-full md:w-24"></div>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left">
+                <thead class="bg-gray-50 border-b">
+                  <tr>
+                    <th class="p-4">Date</th>
+                    <th class="p-4">Description</th>
+                    <th class="p-4">Category</th>
+                    <th class="p-4">Amount</th>
+                    <th class="p-4">Type</th>
+                    <th class="p-4 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="n in 5" :key="n" class="border-b">
+                    <td class="p-4"><div class="h-4 bg-gray-200 rounded w-24"></div></td>
+                    <td class="p-4"><div class="h-4 bg-gray-200 rounded w-40"></div></td>
+                    <td class="p-4"><div class="h-4 bg-gray-200 rounded w-32"></div></td>
+                    <td class="p-4"><div class="h-4 bg-gray-200 rounded w-24"></div></td>
+                    <td class="p-4"><div class="h-4 bg-gray-200 rounded w-16"></div></td>
+                    <td class="p-4 text-right"><div class="h-4 bg-gray-200 rounded w-16 ml-auto"></div></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div v-else class="bg-white rounded-xl shadow-sm overflow-hidden">
             <!-- Filters -->
             <div class="p-4 border-b flex flex-col md:flex-row gap-4 items-stretch md:items-end">
               <div class="flex flex-col gap-1 w-full md:w-40">
@@ -195,11 +273,12 @@
                 <button @click="clearFilters" class="rounded-lg px-4 py-2 bg-gray-200 text-gray-700 font-medium hover:bg-gray-300 transition">Clear</button>
               </div>
             </div>
-            <div class="overflow-x-auto">
+            <div class="overflow-x-auto max-h-[28rem] overflow-y-auto">
               <table class="w-full text-left">
                 <thead class="bg-gray-50 border-b">
                   <tr>
                     <th class="p-4">Date</th>
+                    <th class="p-4">Description</th>
                     <th class="p-4">Category</th>
                     <th class="p-4">Amount</th>
                     <th class="p-4">Type</th>
@@ -209,6 +288,7 @@
                 <tbody>
                   <tr v-for="t in transactions.data" :key="t.id" class="border-b hover:bg-gray-50">
                     <td class="p-4">{{ t.entry_date }}</td>
+                    <td class="p-4">{{ t.description }}</td>
                     <td class="p-4">{{ t.category }}</td>
                     <td class="p-4 font-semibold" :class="t.type === 'income' ? 'text-green-600' : 'text-red-600'">
                       ${{ t.amount }}
@@ -244,7 +324,7 @@
 </template>
 
 <script setup>
-import { ref, computed, defineProps, watch } from 'vue';
+import { ref, computed, defineProps, watch, onMounted } from 'vue';
 import { router, Head } from '@inertiajs/vue3';
 import AuthenticatedLayout from '../Layouts/AuthenticatedLayout.vue';
 import EditTransaction from './EditTransaction.vue';
@@ -278,6 +358,24 @@ const props = defineProps({
 });
 
 const tab = ref('dashboard');
+const tabLoading = ref({
+  dashboard: true,
+  transactions: false,
+});
+
+function selectTab(target) {
+  if (tab.value === target) {
+    return;
+  }
+
+  tab.value = target;
+  tabLoading.value[target] = true;
+
+  setTimeout(() => {
+    tabLoading.value[target] = false;
+  }, 1500);
+}
+
 const filters = ref({ ...props.filters });
 
 // Dashboard chart filters (independent from transactions filter)
@@ -290,6 +388,16 @@ const chartFilters = ref({
 
 // Category lists without 'Salary' for expense-related filters
 const expenseFilterCategories = computed(() => props.categories.filter(cat => cat !== 'Salary'));
+
+// Chart category options: only show 'Salary' when type is income
+const chartCategoryOptions = computed(() => {
+  if (chartFilters.value.type === 'income') {
+    return props.categories.filter(cat => cat === 'Salary');
+  }
+
+  // For 'All' or 'expense', hide 'Salary'
+  return props.categories.filter(cat => cat !== 'Salary');
+});
 
 // When chart type is income, clear category so it doesn't filter by a stale value
 watch(
@@ -389,6 +497,12 @@ function deleteTransaction(id) {
     router.delete(route('transactions.destroy', id));
   }
 }
+
+onMounted(() => {
+  setTimeout(() => {
+    tabLoading.value.dashboard = false;
+  }, 1500);
+});
 </script>
 
 <style scoped>

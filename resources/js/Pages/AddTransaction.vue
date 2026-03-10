@@ -139,7 +139,6 @@ function submit() {
       errors.value = {};
       processing.value = false;
       emit('close');
-      router.visit(route('dashboard'));
     },
     onError: (e) => {
       errors.value = e;
