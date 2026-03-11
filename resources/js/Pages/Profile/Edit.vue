@@ -4,81 +4,11 @@
 
     <div class="min-h-screen w-full flex flex-col md:flex-row bg-base-200 text-base-content">
       <!-- Sidebar -->
-      <aside class="w-full md:w-64 flex md:flex-col flex-row items-stretch md:min-h-screen bg-base-100 border-b md:border-b-0 md:border-r border-base-200 sticky top-0 z-20 shadow-md">
-        <!-- Logo -->
-        <div class="flex items-center gap-3 px-5 py-4 border-b border-base-200 shrink-0">
-          <img src="/public/images/stracker-logo.png" alt="Stracker Logo" class="h-8 w-auto" />
-          <span class="hidden md:block font-bold text-base tracking-tight text-base-content">Stracker</span>
-        </div>
-
-        <!-- Navigation -->
-        <ul class="menu menu-md px-3 py-4 gap-0.5 flex-1 w-full">
-          <li>
-            <button
-              class="w-full justify-start gap-3 font-medium rounded-xl"
-              @click="router.get(route('dashboard'))"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="h-5 w-5 shrink-0">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3.75 4.5h7.5v7.5h-7.5zM12.75 4.5h7.5v7.5h-7.5zM12.75 13.5h7.5v7.5h-7.5zM3.75 13.5h7.5v7.5h-7.5z" />
-              </svg>
-              <span>Dashboard</span>
-            </button>
-          </li>
-          <li>
-            <button
-              class="w-full justify-start gap-3 font-medium rounded-xl"
-              @click="router.get(route('categories.index'))"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="h-5 w-5 shrink-0">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z" />
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M6 6h.008v.008H6V6z" />
-              </svg>
-              <span>Categories</span>
-            </button>
-          </li>
-          <li>
-            <button
-              class="w-full justify-start gap-3 font-medium rounded-xl"
-              @click="router.get(route('transactions.recent'))"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="h-5 w-5 shrink-0">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 6v6h4.5M4.5 12a7.5 7.5 0 1115 0 7.5 7.5 0 01-15 0z" />
-              </svg>
-              <span>Transactions</span>
-            </button>
-          </li>
-        </ul>
-
-        <!-- Add Transaction CTA -->
-        <div class="px-4 pb-4 shrink-0">
-          <button
-            class="btn btn-primary w-full gap-2 font-semibold shadow-sm"
-            @click="router.get(route('transactions.add'))"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="h-5 w-5">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 4.5v15m7.5-7.5h-15" />
-            </svg>
-            Add Transaction
-          </button>
-        </div>
-
-        <div class="divider my-0 mx-4 h-px"></div>
-
-        <!-- User profile (active state) -->
-        <div class="px-3 pb-5 pt-2 shrink-0">
-          <div class="flex w-full items-center gap-3 rounded-xl p-3 bg-base-200">
-            <div class="avatar placeholder shrink-0">
-              <div class="bg-primary text-primary-content rounded-full w-8">
-                <span class="text-xs font-bold">{{ auth.user.name?.charAt(0).toUpperCase() }}</span>
-              </div>
-            </div>
-            <div class="hidden md:block min-w-0">
-              <p class="text-sm font-semibold text-base-content truncate leading-tight">{{ auth.user.name }}</p>
-              <p class="text-xs text-base-content/50">Profile Settings</p>
-            </div>
-          </div>
-        </div>
-      </aside>
+      <AppSidebar
+        :user="auth.user"
+        active-page=""
+        @add-transaction="showAddTransaction = true"
+      />
 
       <!-- Main content -->
       <main class="flex-1 px-4 md:px-12 py-8 w-full space-y-6">
@@ -130,6 +60,67 @@
           </div>
         </div>
 
+        <!-- Change Password Card -->
+        <div class="card bg-base-100 border border-base-200 shadow-xl">
+          <div class="card-body gap-5">
+            <div>
+              <h2 class="text-lg font-bold text-base-content">Change Password</h2>
+              <p class="text-sm text-base-content/60 mt-0.5">Ensure your account uses a strong password.</p>
+            </div>
+
+            <div v-if="status === 'password-updated'" class="alert alert-success shadow">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>Password updated successfully.</span>
+            </div>
+
+            <form @submit.prevent="submitPassword" class="space-y-4">
+              <label class="form-control w-full gap-1">
+                <span class="label-text font-semibold">Current Password</span>
+                <input
+                  v-model="passwordForm.current_password"
+                  type="password"
+                  class="input input-bordered w-full bg-base-100"
+                  autocomplete="current-password"
+                  required
+                />
+                <span v-if="passwordForm.errors.current_password" class="label-text-alt text-error">{{ passwordForm.errors.current_password }}</span>
+              </label>
+
+              <label class="form-control w-full gap-1">
+                <span class="label-text font-semibold">New Password</span>
+                <input
+                  v-model="passwordForm.password"
+                  type="password"
+                  class="input input-bordered w-full bg-base-100"
+                  autocomplete="new-password"
+                  required
+                />
+                <span v-if="passwordForm.errors.password" class="label-text-alt text-error">{{ passwordForm.errors.password }}</span>
+              </label>
+
+              <label class="form-control w-full gap-1">
+                <span class="label-text font-semibold">Confirm New Password</span>
+                <input
+                  v-model="passwordForm.password_confirmation"
+                  type="password"
+                  class="input input-bordered w-full bg-base-100"
+                  autocomplete="new-password"
+                  required
+                />
+                <span v-if="passwordForm.errors.password_confirmation" class="label-text-alt text-error">{{ passwordForm.errors.password_confirmation }}</span>
+              </label>
+
+              <div class="flex justify-end">
+                <button type="submit" class="btn btn-primary" :disabled="passwordForm.processing">
+                  Update Password
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
         <!-- Danger Zone Card -->
         <div class="card bg-base-100 border border-base-200 shadow-xl">
           <div class="card-body gap-5">
@@ -166,6 +157,13 @@
       </main>
     </div>
 
+    <!-- Add Transaction Modal -->
+    <AddTransaction
+      v-if="showAddTransaction"
+      :categories="[]"
+      @close="showAddTransaction = false"
+    />
+
     <!-- Delete Account Modal -->
     <div v-if="showDeleteModal" class="modal modal-open">
       <div class="modal-box">
@@ -200,6 +198,8 @@
 import { ref } from 'vue';
 import { router, useForm, Head } from '@inertiajs/vue3';
 import AuthenticatedLayout from '../../Layouts/AuthenticatedLayout.vue';
+import AppSidebar from '@/Components/AppSidebar.vue';
+import AddTransaction from '@/Pages/AddTransaction.vue';
 
 const props = defineProps({
   auth: Object,
@@ -217,6 +217,19 @@ const deleteForm = useForm({
 });
 
 const showDeleteModal = ref(false);
+const showAddTransaction = ref(false);
+
+const passwordForm = useForm({
+  current_password: '',
+  password: '',
+  password_confirmation: '',
+});
+
+function submitPassword() {
+  passwordForm.put(route('password.update'), {
+    onSuccess: () => passwordForm.reset(),
+  });
+}
 
 function submitProfile() {
   profileForm.patch(route('profile.update'));
