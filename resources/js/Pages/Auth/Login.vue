@@ -66,37 +66,55 @@
           <div class="grid gap-4 md:grid-cols-3">
             <div class="card bg-gray-100 shadow-sm border border-base-200">
               <div class="card-body py-4 px-5">
-                <h3 class="card-title text-sm font-semibold mb-1 text-black">🔒 Secure & private</h3>
+                <h3 class="card-title text-sm font-semibold mb-1 text-black flex items-center gap-1.5">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-primary shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                  Secure & private
+                </h3>
                 <p class="text-xs text-base-content/80">Your data is encrypted in transit and stored safely so only you can see your numbers.</p>
               </div>
             </div>
             <div class="card bg-gray-100 shadow-sm border border-base-200">
               <div class="card-body py-4 px-5">
-                <h3 class="card-title text-sm font-semibold mb-1 text-black">📱 Works across devices</h3>
+                <h3 class="card-title text-sm font-semibold mb-1 text-black flex items-center gap-1.5">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-primary shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+                  Works across devices
+                </h3>
                 <p class="text-xs text-base-content/80">Log in from desktop or mobile and pick up exactly where you left off.</p>
               </div>
             </div>
             <div class="card bg-gray-100 shadow-sm border border-base-200">
               <div class="card-body py-4 px-5">
-                <h3 class="card-title text-sm font-semibold mb-1 text-black">📤 Export when you need</h3>
+                <h3 class="card-title text-sm font-semibold mb-1 text-black flex items-center gap-1.5">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-primary shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
+                  Export when you need
+                </h3>
                 <p class="text-xs text-base-content/80">Download your transactions for sharing with your accountant or for backup.</p>
               </div>
             </div>
             <div class="card bg-gray-100 shadow-sm border border-base-200">
               <div class="card-body py-4 px-5">
-                <h3 class="card-title text-sm font-semibold mb-1 text-black">📊 Visual insights</h3>
+                <h3 class="card-title text-sm font-semibold mb-1 text-black flex items-center gap-1.5">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-primary shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
+                  Visual insights
+                </h3>
                 <p class="text-xs text-base-content/80">See where your money goes with clear charts and category breakdowns every month.</p>
               </div>
             </div>
             <div class="card bg-gray-100 shadow-sm border border-base-200">
               <div class="card-body py-4 px-5">
-                <h3 class="card-title text-sm font-semibold mb-1 text-black">⚡ Real-time tracking</h3>
+                <h3 class="card-title text-sm font-semibold mb-1 text-black flex items-center gap-1.5">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-primary shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                  Real-time tracking
+                </h3>
                 <p class="text-xs text-base-content/80">Add income or expenses in seconds and watch your balance update instantly.</p>
               </div>
             </div>
             <div class="card bg-gray-100 shadow-sm border border-base-200">
               <div class="card-body py-4 px-5">
-                <h3 class="card-title text-sm font-semibold mb-1 text-black">🎯 Goal-oriented</h3>
+                <h3 class="card-title text-sm font-semibold mb-1 text-black flex items-center gap-1.5">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-primary shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                  Goal-oriented
+                </h3>
                 <p class="text-xs text-base-content/80">Set spending limits per category and get a clear picture of how well you're sticking to them.</p>
               </div>
             </div>
@@ -104,10 +122,6 @@
 
           <!-- Stats row -->
           <div class="mt-12 grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-            <div class="bg-base-100 rounded-2xl py-6 px-4 shadow-sm border border-base-200">
-              <p class="text-3xl font-extrabold text-primary">5k+</p>
-              <p class="text-xs text-base-content/60 mt-1">Active users</p>
-            </div>
             <div class="bg-base-100 rounded-2xl py-6 px-4 shadow-sm border border-base-200">
               <p class="text-3xl font-extrabold text-primary">₱2M+</p>
               <p class="text-xs text-base-content/60 mt-1">Transactions tracked</p>

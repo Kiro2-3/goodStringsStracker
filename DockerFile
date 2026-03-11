@@ -1,0 +1,20 @@
+FROM richarvey/nginx-php-fpm:latest
+
+# I-copy ang lahat ng files ng project
+COPY . /var/www/html
+
+# I-set ang working directory
+WORKDIR /var/www/html
+
+# I-install ang dependencies (no-dev para sa production)
+RUN composer install --no-dev --optimize-autoloader
+
+# I-set ang permissions
+RUN chown -R webuser:webgroup /var/www/html/storage /var/www/html/bootstrap/cache
+
+# I-configure ang Nginx para sa Laravel (public folder)
+ENV WEBROOT /var/www/html/public
+ENV APP_ENV production
+
+# Awtomatikong mag-migrate (Optional pero helpful)
+ENV RUN_SCRIPTS 1
