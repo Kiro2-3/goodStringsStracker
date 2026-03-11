@@ -40,7 +40,7 @@
             </p>
             <div class="login-hero-cta-row">
               <Link :href="route('register')" class="login-hero-primary-cta btn btn-primary btn-lg normal-case">Start tracking for free</Link>
-              <button type="button" class="login-hero-secondary-cta btn btn-ghost btn-lg normal-case">Learn more</button>
+              <
             </div>
           </div>
 
@@ -86,20 +86,20 @@
 
       <div
         v-if="showLoginModal"
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-base-200/70 dark:bg-neutral/80 backdrop-blur-sm px-4"
         @click.self="closeLoginModal"
       >
         <div class="relative w-full max-w-md">
-          <button
-            type="button"
-            class="btn btn-circle btn-sm btn-ghost absolute -right-2 -top-2 bg-base-100 shadow"
-            @click="closeLoginModal"
-            aria-label="Close login"
-          >
-            ✕
-          </button>
-          <div class="login-inspiration-card card bg-base-100 shadow-xl border border-base-200">
-            <div class="card-body w-full">
+          <div class="login-inspiration-card card bg-base-100 dark:bg-neutral shadow-2xl border border-base-300 relative overflow-visible">
+            <button
+              type="button"
+              class="btn btn-circle btn-sm btn-error text-white absolute -right-3 -top-3 shadow-lg"
+              @click="closeLoginModal"
+              aria-label="Close login"
+            >
+              ✕
+            </button>
+            <div class="card-body w-full pt-6">
               <form @submit.prevent="submit" class="login-inspiration-form-fields space-y-6">
                 <div class="login-inspiration-inputs">
                   <div>
