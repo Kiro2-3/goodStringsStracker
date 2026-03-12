@@ -4,6 +4,7 @@ FROM php:8.4-fpm-alpine
 RUN apk add --no-cache \
     curl \
     bash \
+    git \
     nginx \
     supervisor \
     libpng-dev \
@@ -33,7 +34,7 @@ COPY . .
 
 # Install Composer dependencies
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-RUN php /usr/local/bin/composer install --optimize-autoloader
+RUN php /usr/local/bin/composer install --no-dev --optimize-autoloader
 
 # Install NPM dependencies and build assets
 # (Wayfinder needs PHP to run artisan, so we build in the same stage)
