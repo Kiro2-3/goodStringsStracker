@@ -127,16 +127,8 @@
                         <h3 class="text-lg font-semibold text-base-content">Income vs Expense Over Time</h3>
                         <span class="badge badge-primary badge-outline badge-sm">Trend Overview</span>
                       </div>
-                      <div class="flex flex-wrap gap-1.5">
-                        <div class="badge badge-success badge-outline gap-1.5 px-2 py-2 text-xs">
-                          <span class="h-2 w-2 rounded-full bg-success"></span>
-                          Income ₱{{ formatCurrency(summaryForDisplay.income) }}
-                        </div>
-                        <div class="badge badge-error badge-outline gap-1.5 px-2 py-2 text-xs">
-                          <span class="h-2 w-2 rounded-full bg-error"></span>
-                          Expense ₱{{ formatCurrency(summaryForDisplay.expense) }}
-                        </div>
-                      </div>
+     
+
                     </div>
 
                     <div class="grid grid-cols-2 gap-2">

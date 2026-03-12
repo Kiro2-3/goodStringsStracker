@@ -42,7 +42,7 @@
         </li>
         <li class="mb-1">
           <button
-            class="w-full justify-start gap-3 font-semibold rounded-xl btn btn-primary text-primary-content"
+            class="w-full justify-start gap-3 font-semibold rounded-xl btn bg-gray-200 text-gray-600 border-gray-200 hover:bg-gray-300 hover:border-gray-300"
             @click="$emit('add-transaction'); mobileOpen = false"
           >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="h-5 w-5 shrink-0">
@@ -126,7 +126,7 @@
       </li>
       <li class="mb-1">
         <button
-          class="w-full justify-start gap-3 font-semibold rounded-xl btn btn-primary text-primary-content"
+          class="w-full justify-start gap-3 font-semibold rounded-xl btn bg-gray-200 text-gray-600 border-gray-200 hover:bg-gray-300 hover:border-gray-300"
           @click="$emit('add-transaction')"
         >
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="h-5 w-5 shrink-0">
