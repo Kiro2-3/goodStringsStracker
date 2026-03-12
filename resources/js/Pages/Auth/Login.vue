@@ -20,12 +20,12 @@
         <div class="login-hero-nav-actions">
           <button
             type="button"
-            class="login-hero-link login-hero-link-muted btn btn-ghost btn-sm normal-case"
+            class="btn btn-sm normal-case font-semibold rounded-lg border-0 text-white px-5 transition-all duration-300 hover:scale-105 hover:shadow-[0_0_18px_3px_rgba(124,58,237,0.4)]"
+            style="background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 60%, #2563eb 100%);"
             @click="openLoginModal"
           >
             Log in
           </button>
-        
         </div>
       </header>
 
@@ -327,10 +327,16 @@
             <!-- Submit -->
             <button
               type="submit"
-              class="btn btn-primary btn-block mt-1 rounded-xl"
+              class="btn btn-block btn-lg mt-1 rounded-xl font-bold tracking-wide border-0 text-white transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_24px_4px_rgba(124,58,237,0.45)] disabled:opacity-70 disabled:cursor-not-allowed disabled:scale-100"
+              style="background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 60%, #2563eb 100%);"
               :disabled="form.processing"
             >
               <span v-if="form.processing" class="loading loading-spinner loading-sm"></span>
+              <template v-else>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6A2.25 2.25 0 005.25 5.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M18 12H9m0 0l3-3m-3 3l3 3" />
+                </svg>
+              </template>
               {{ form.processing ? 'Signing in...' : 'Sign In' }}
             </button>
           </form>
