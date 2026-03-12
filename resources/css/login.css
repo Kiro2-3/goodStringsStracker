@@ -977,6 +977,56 @@
   }
 }
 
+/* ---- Feature card marquee ---- */
+.feature-marquee-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  overflow: hidden;
+}
+
+.feature-marquee {
+  overflow: hidden;
+  width: 100%;
+}
+
+.feature-marquee-track {
+  display: flex;
+  gap: 1rem;
+  width: max-content;
+}
+
+.feature-card {
+  flex: 0 0 300px;
+  cursor: default;
+  transition: all 0.2s ease;
+}
+
+/* Pause on hover */
+.feature-marquee:hover .feature-marquee-track {
+  animation-play-state: paused;
+}
+
+/* Left to right */
+.feature-marquee-ltr .feature-marquee-track {
+  animation: marquee-ltr 18s linear infinite;
+}
+
+/* Right to left */
+.feature-marquee-rtl .feature-marquee-track {
+  animation: marquee-rtl 18s linear infinite;
+}
+
+@keyframes marquee-ltr {
+  0%   { transform: translateX(-50%); }
+  100% { transform: translateX(0%); }
+}
+
+@keyframes marquee-rtl {
+  0%   { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+
 /* ---- Hover effects ---- */
 
 /* Nav login button */
