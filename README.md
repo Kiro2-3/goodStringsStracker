@@ -63,7 +63,7 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 
 
 
-# 💰 Personal Finance Tracker
+# 💰 sTracker
 
 A full-stack web application built with **Laravel 12** and **Vue 3 (Inertia.js)**. This tool allows users to track their income and expenses, visualize spending habits via charts, and manage their financial history.
 
