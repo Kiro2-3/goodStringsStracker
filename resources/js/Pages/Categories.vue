@@ -192,149 +192,138 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import axios from 'axios';
-import { router, Head } from '@inertiajs/vue3';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import AppSidebar from '@/Components/AppSidebar.vue';
-import AddTransaction from '@/Pages/AddTransaction.vue';
+import { ref } from 'vue'
+import axios from 'axios'
+import { Head, router } from '@inertiajs/vue3'
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
+import AppSidebar from '@/Components/AppSidebar.vue'
+import AddTransaction from '@/Pages/AddTransaction.vue'
 
 const props = defineProps({
   auth:       { type: Object, required: true },
   categories: { type: Array,  default: () => [] },
   flash:      { type: Object, default: () => ({}) },
-});
+})
 
-// Local reactive copy so we can update without a full page reload
-const localCategories = ref([...props.categories]);
-const showAddTransaction = ref(false);
+const localCategories    = ref([...props.categories])
+const showAddTransaction = ref(false)
 
-// ── Add modal ──────────────────────────────────────────────
-const showAddModal    = ref(false);
-const newCategoryName = ref('');
-const addError        = ref('');
-const saving          = ref(false);
+const showAddModal    = ref(false)
+const newCategoryName = ref('')
+const addError        = ref('')
+const saving          = ref(false)
 
 function openAddModal() {
-  newCategoryName.value = '';
-  addError.value = '';
-  showAddModal.value = true;
+  newCategoryName.value = ''
+  addError.value = ''
+  showAddModal.value = true
 }
 
 function closeAddModal() {
-  showAddModal.value = false;
+  showAddModal.value = false
 }
 
 function saveCategory() {
-  const name = newCategoryName.value.trim();
+  const name = newCategoryName.value.trim()
 
   if (!name) {
-    addError.value = 'Category name is required.';
-    return;
+    addError.value = 'Category name is required.'
+    return
   }
 
-  if (localCategories.value.some(c => c.name.toLowerCase() === name.toLowerCase())) {
-    addError.value = 'This category already exists.';
-    return;
+  if (localCategories.value.some((c) => c.name.toLowerCase() === name.toLowerCase())) {
+    addError.value = 'This category already exists.'
+    return
   }
 
-  saving.value = true;
-  addError.value = '';
+  saving.value   = true
+  addError.value = ''
 
   axios.post(route('categories.store'), { name })
     .then(({ data }) => {
-      localCategories.value.push({ id: data.id, name: data.name });
-      localCategories.value.sort((a, b) => a.name.localeCompare(b.name));
-      showAddModal.value = false;
+      localCategories.value.push({ id: data.id, name: data.name })
+      localCategories.value.sort((a, b) => a.name.localeCompare(b.name))
+      showAddModal.value = false
     })
     .catch((err) => {
-      addError.value =
-        err.response?.data?.errors?.name?.[0] ?? 'Unable to save category.';
+      addError.value = err.response?.data?.errors?.name?.[0] ?? 'Unable to save category.'
     })
     .finally(() => {
-      saving.value = false;
-    });
+      saving.value = false
+    })
 }
 
-// ── Edit modal ────────────────────────────────────────────
-const showEditModal    = ref(false);
-const categoryToEdit   = ref(null);
-const editCategoryName = ref('');
-const editError        = ref('');
-const editing          = ref(false);
+const showEditModal    = ref(false)
+const categoryToEdit   = ref(null)
+const editCategoryName = ref('')
+const editError        = ref('')
+const editing          = ref(false)
 
 function openEditModal(cat) {
-  categoryToEdit.value   = cat;
-  editCategoryName.value = cat.name;
-  editError.value        = '';
-  showEditModal.value    = true;
+  categoryToEdit.value   = cat
+  editCategoryName.value = cat.name
+  editError.value        = ''
+  showEditModal.value    = true
 }
 
 function closeEditModal() {
-  showEditModal.value = false;
-  categoryToEdit.value = null;
+  showEditModal.value  = false
+  categoryToEdit.value = null
 }
 
 function saveEdit() {
-  const name = editCategoryName.value.trim();
+  const name = editCategoryName.value.trim()
 
   if (!name) {
-    editError.value = 'Category name is required.';
-    return;
+    editError.value = 'Category name is required.'
+    return
   }
 
   if (
     localCategories.value.some(
-      c => c.id !== categoryToEdit.value.id && c.name.toLowerCase() === name.toLowerCase()
+      (c) => c.id !== categoryToEdit.value.id && c.name.toLowerCase() === name.toLowerCase(),
     )
   ) {
-    editError.value = 'A category with this name already exists.';
-    return;
+    editError.value = 'A category with this name already exists.'
+    return
   }
 
-  editing.value   = true;
-  editError.value = '';
+  editing.value   = true
+  editError.value = ''
 
   axios.put(route('categories.update', categoryToEdit.value.id), { name })
     .then(({ data }) => {
-      const cat = localCategories.value.find(c => c.id === data.id);
+      const cat = localCategories.value.find((c) => c.id === data.id)
       if (cat) {
-        cat.name = data.name;
+        cat.name = data.name
       }
-      localCategories.value.sort((a, b) => a.name.localeCompare(b.name));
-      showEditModal.value = false;
+      localCategories.value.sort((a, b) => a.name.localeCompare(b.name))
+      showEditModal.value = false
     })
     .catch((err) => {
-      editError.value =
-        err.response?.data?.errors?.name?.[0] ?? 'Unable to update category.';
+      editError.value = err.response?.data?.errors?.name?.[0] ?? 'Unable to update category.'
     })
     .finally(() => {
-      editing.value = false;
-    });
+      editing.value = false
+    })
 }
 
-// ── Delete modal ──────────────────────────────────────────
-const categoryToDelete = ref(null);
+const categoryToDelete = ref(null)
 
 function confirmDelete(cat) {
-  categoryToDelete.value = cat;
+  categoryToDelete.value = cat
 }
 
 function deleteCategory() {
-  const cat = categoryToDelete.value;
+  const cat = categoryToDelete.value
   if (!cat) {
-    return;
+    return
   }
 
-  categoryToDelete.value = null;
+  categoryToDelete.value = null
 
   router.delete(route('categories.destroy', cat.id), {
     preserveScroll: true,
-  });
-}
-
-// ── Nav helpers ───────────────────────────────────────────
-function logout() {
-  router.post(route('logout'));
+  })
 }
 </script>

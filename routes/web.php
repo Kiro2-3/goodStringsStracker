@@ -1,11 +1,10 @@
 <?php
 
+use App\Http\Controllers\Category\CategoryController;
 use App\Http\Controllers\Profile\ProfileController;
 use App\Http\Controllers\Transaction\TransactionController;
-use App\Models\Category;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
-use Inertia\Inertia;
+use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     if (Auth::check()) {
@@ -15,112 +14,52 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
-// This route calls the "index" method in your TransactionController
 Route::get('/dashboard', [TransactionController::class, 'index'])
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
 Route::middleware('auth')->group(function () {
+    Route::get('/transactions/recent', [TransactionController::class, 'recent'])
+        ->name('transactions.recent');
 
-        // Recent Transactions page (dedicated)
-        Route::get('/transactions/recent', [TransactionController::class, 'recent'])
-            ->name('transactions.recent');
+    Route::get('/transactions/export-csv', [TransactionController::class, 'exportCsv'])
+        ->name('transactions.export-csv');
 
-        // Export transactions as CSV
-        Route::get('/transactions/export-csv', [TransactionController::class, 'exportCsv'])
-            ->name('transactions.export-csv');
-    
-    // Add Transaction page
-    Route::get('/transactions/add', function () {
-        $user = Auth::user();
+    Route::get('/transactions/add', [TransactionController::class, 'create'])
+        ->name('transactions.add');
 
-        $categories = $user->categories()->orderBy('name')->pluck('name');
+    Route::post('/transactions', [TransactionController::class, 'store'])
+        ->name('transactions.store');
 
-        if ($categories->isEmpty()) {
-            $categories = $user->transactions()->select('category')->distinct()->pluck('category');
-        }
+    Route::get('/transactions/{transaction}/edit', [TransactionController::class, 'show'])
+        ->name('transactions.edit');
 
-        return Inertia::render('AddTransaction', [
-            'categories' => $categories,
-            'standalone' => true,
-        ]);
-    })->name('transactions.add');
+    Route::put('/transactions/{transaction}', [TransactionController::class, 'update'])
+        ->name('transactions.update');
 
-    // Categories page
-    Route::get('/categories', function () {
-        $user = Auth::user();
-        $categories = $user->categories()->orderBy('name')->get(['id', 'name']);
+    Route::delete('/transactions/{transaction}', [TransactionController::class, 'destroy'])
+        ->name('transactions.destroy');
 
-        return Inertia::render('Categories', [
-            'auth'       => ['user' => $user],
-            'categories' => $categories,
-        ]);
-    })->name('categories.index');
+    Route::get('/categories', [CategoryController::class, 'index'])
+        ->name('categories.index');
 
-    // Store a new standalone category
-    Route::post('/categories', function (\Illuminate\Http\Request $request) {
-        $user = Auth::user();
+    Route::post('/categories', [CategoryController::class, 'store'])
+        ->name('categories.store');
 
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-        ]);
+    Route::put('/categories/{category}', [CategoryController::class, 'update'])
+        ->name('categories.update');
 
-        $category = Category::firstOrCreate([
-            'user_id' => $user->id,
-            'name'    => $validated['name'],
-        ]);
+    Route::delete('/categories/{category}', [CategoryController::class, 'destroy'])
+        ->name('categories.destroy');
 
-        return response()->json([
-            'id'   => $category->id,
-            'name' => $category->name,
-        ]);
-    })->name('categories.store');
+    Route::get('/profile', [ProfileController::class, 'edit'])
+        ->name('profile.edit');
 
-    // Update a category
-    Route::put('/categories/{category}', function (\Illuminate\Http\Request $request, Category $category) {
-        if ($category->user_id !== Auth::id()) 
-    {
-            abort(403);
-        }
+    Route::patch('/profile', [ProfileController::class, 'update'])
+        ->name('profile.update');
 
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-        ]);
-
-        $category->update(['name' => $validated['name']]);
-
-        return response()->json([
-            'id'   => $category->id,
-            'name' => $category->name,
-        ]);
-    })->name('categories.update');
-
-    // Delete a category
-    Route::delete('/categories/{category}', function (Category $category) {
-        if ($category->user_id !== Auth::id()) {
-            abort(403);
-        }
-
-        $category->delete();
-
-        return redirect()->route('categories.index')->with('success', 'Category deleted.');
-    })->name('categories.destroy');
-
-    // Transaction routes: store (create), show (display edit form), update (save changes), and delete
-    Route::post('/transactions', [TransactionController::class, 'store'])->name('transactions.store');
-
-    // Show the edit form for a specific transaction
-    Route::get('/transactions/{transaction}/edit', [TransactionController::class, 'show'])->name('transactions.edit');
-
-    // Update the transaction with new data
-    Route::put('/transactions/{transaction}', [TransactionController::class, 'update'])->name('transactions.update');
-
-    // Delete a transaction
-    Route::delete('/transactions/{transaction}', [TransactionController::class, 'destroy'])->name('transactions.destroy');
-
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])
+        ->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

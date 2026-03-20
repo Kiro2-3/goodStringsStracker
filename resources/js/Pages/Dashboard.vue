@@ -204,201 +204,186 @@
 </template>
 
 <script setup>
-import { ref, computed, defineProps, watch, onMounted } from 'vue';
-import { router, Head } from '@inertiajs/vue3';
-import AuthenticatedLayout from '../Layouts/AuthenticatedLayout.vue';
-import AppSidebar from '@/Components/AppSidebar.vue';
-import EditTransaction from './EditTransaction.vue';
-import AddTransaction from './AddTransaction.vue';
-import LineChart from '../Components/LineChart.vue';
-import PieChart from '../Components/PieChart.vue';
+import { computed, onMounted, ref, watch } from 'vue'
+import { Head, router } from '@inertiajs/vue3'
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
+import AppSidebar from '@/Components/AppSidebar.vue'
+import EditTransaction from '@/Pages/EditTransaction.vue'
+import AddTransaction from '@/Pages/AddTransaction.vue'
+import LineChart from '@/Components/LineChart.vue'
+import PieChart from '@/Components/PieChart.vue'
+
+const PIE_CHART_COLOR_MAP = {
+  'Total Income':  '#2563eb',
+  'Total Expense': '#dc2626',
+  'Total Revenue': '#16a34a',
+}
+
+const props = defineProps({
+  auth:                 Object,
+  transactions:         Object,
+  summary:              Object,
+  categories:           Array,
+  transactionCategories: Array,
+  expenseTotals:        Array,
+  incomeTotals:         Array,
+  chartTransactions:    Array,
+})
+
+const showAddTransaction = ref(false)
+const editTransaction    = ref(null)
+const tab                = ref('dashboard')
+const tabLoading         = ref({ dashboard: true })
+
+const chartFilters = ref({
+  type:      '',
+  category:  '',
+  date_from: '',
+  date_to:   '',
+})
+
+function openEditTransaction(transaction) {
+  editTransaction.value = { ...transaction }
+}
 
 function logout() {
   router.post(route('logout'), {}, {
     onSuccess: () => {
-      router.visit(route('login'));
-    }
-  });
+      router.visit(route('login'))
+    },
+  })
 }
-
-const showAddTransaction = ref(false);
-const editTransaction = ref(null);
-
-function openEditTransaction(transaction) {
-  editTransaction.value = { ...transaction };
-}
-
-const props = defineProps({
-  auth: Object,
-  transactions: Object,
-  summary: Object,
-  categories: Array,
-  transactionCategories: Array,
-  expenseTotals: Array,
-  incomeTotals: Array,
-  chartTransactions: Array,
-});
-
-const tab = ref('dashboard');
-const tabLoading = ref({ dashboard: true });
 
 function selectTab(target) {
   if (tab.value === target) {
-    return;
+    return
   }
-  tab.value = target;
-  tabLoading.value[target] = true;
+  tab.value = target
+  tabLoading.value[target] = true
   setTimeout(() => {
-    tabLoading.value[target] = false;
-  }, 1500);
+    tabLoading.value[target] = false
+  }, 1500)
 }
 
-// Dashboard chart filters
-const chartFilters = ref({
-  type: '',
-  category: '',
-  date_from: '',
-  date_to: ''
-});
-
 const activeChartFilterCount = computed(() => {
-  return Object.values(chartFilters.value).filter((value) => value !== '').length;
-});
+  return Object.values(chartFilters.value).filter((value) => value !== '').length
+})
 
-// All user categories from the Categories table
-const expenseFilterCategories = computed(() => props.categories);
+const chartCategoryOptions = computed(() => props.transactionCategories ?? props.categories)
 
-// Chart category options: only show categories used in actual transactions
-const chartCategoryOptions = computed(() => props.transactionCategories ?? props.categories);
-
-// When chart type is income, clear category so it doesn't filter by a stale value
 watch(
   () => chartFilters.value.type,
   (newType) => {
     if (newType === 'income') {
-      chartFilters.value.category = '';
+      chartFilters.value.category = ''
     }
-  }
-);
+  },
+)
 
 function clearChartFilters() {
-  chartFilters.value = { type: '', category: '', date_from: '', date_to: '' };
-  router.get(route('dashboard'));
+  chartFilters.value = { type: '', category: '', date_from: '', date_to: '' }
+  router.get(route('dashboard'))
 }
 
-// Filtered transactions for dashboard charts
 const filteredChartTransactions = computed(() => {
   return (props.chartTransactions || []).filter((t) => {
-    if (chartFilters.value.type && t.type !== chartFilters.value.type) return false;
-    if (chartFilters.value.category && t.category !== chartFilters.value.category) return false;
-    if (chartFilters.value.date_from && t.entry_date < chartFilters.value.date_from) return false;
-    if (chartFilters.value.date_to && t.entry_date > chartFilters.value.date_to) return false;
-    return true;
-  });
-});
+    if (chartFilters.value.type && t.type !== chartFilters.value.type) return false
+    if (chartFilters.value.category && t.category !== chartFilters.value.category) return false
+    if (chartFilters.value.date_from && t.entry_date < chartFilters.value.date_from) return false
+    if (chartFilters.value.date_to && t.entry_date > chartFilters.value.date_to) return false
+    return true
+  })
+})
 
 const filteredLineData = computed(() => {
-  const dateMap = {};
+  const dateMap = {}
   filteredChartTransactions.value.forEach((t) => {
-    const date = t.entry_date;
-    if (!dateMap[date]) dateMap[date] = { date, income: 0, expense: 0 };
+    const date = t.entry_date
+    if (!dateMap[date]) dateMap[date] = { date, income: 0, expense: 0 }
     if (t.type === 'income') {
-      dateMap[date].income += parseFloat(t.amount);
+      dateMap[date].income += parseFloat(t.amount)
     } else {
-      dateMap[date].expense += parseFloat(t.amount);
+      dateMap[date].expense += parseFloat(t.amount)
     }
-  });
-  return Object.values(dateMap).sort((a, b) => a.date.localeCompare(b.date));
-});
+  })
+  return Object.values(dateMap).sort((a, b) => a.date.localeCompare(b.date))
+})
 
 const filteredPieChartData = computed(() => {
-  let totalIncome = 0;
-  let totalExpense = 0;
+  let totalIncome  = 0
+  let totalExpense = 0
+
   filteredChartTransactions.value.forEach((t) => {
     if (t.type === 'income') {
-      totalIncome += Number(t.amount);
+      totalIncome += Number(t.amount)
     } else if (t.type === 'expense') {
-      totalExpense += Number(t.amount);
+      totalExpense += Number(t.amount)
     }
-  });
-  const totalRevenue = totalIncome - totalExpense;
-  // Only show slices that are > 0
-  const data = [];
-  if (totalIncome > 0) data.push({ label: 'Total Income', value: totalIncome });
-  if (totalExpense > 0) data.push({ label: 'Total Expense', value: totalExpense });
-  // Revenue can be negative, but show it for completeness
-  data.push({ label: 'Total Revenue', value: totalRevenue });
-  return data;
-});
+  })
+
+  const totalRevenue = totalIncome - totalExpense
+  const data = []
+
+  if (totalIncome > 0) data.push({ label: 'Total Income', value: totalIncome })
+  if (totalExpense > 0) data.push({ label: 'Total Expense', value: totalExpense })
+  data.push({ label: 'Total Revenue', value: totalRevenue })
+
+  return data
+})
 
 const summaryForDisplay = computed(() => {
-  let income = 0;
-  let expense = 0;
+  let income  = 0
+  let expense = 0
 
   filteredChartTransactions.value.forEach((t) => {
     if (t.type === 'income') {
-      income += Number(t.amount);
+      income += Number(t.amount)
     } else if (t.type === 'expense') {
-      expense += Number(t.amount);
+      expense += Number(t.amount)
     }
-  });
+  })
 
-  const balance = income - expense;
+  const balance = income - expense
 
   return {
-    income: income.toFixed(2),
+    income:  income.toFixed(2),
     expense: expense.toFixed(2),
     balance: balance.toFixed(2),
-  };
-});
+  }
+})
 
 const chartDateRangeLabel = computed(() => {
-  const { date_from: dateFrom, date_to: dateTo } = chartFilters.value;
+  const { date_from: dateFrom, date_to: dateTo } = chartFilters.value
 
-  if (dateFrom && dateTo) {
-    return `${dateFrom} → ${dateTo}`;
-  }
+  if (dateFrom && dateTo) return `${dateFrom} → ${dateTo}`
+  if (dateFrom) return `From ${dateFrom}`
+  if (dateTo) return `Until ${dateTo}`
 
-  if (dateFrom) {
-    return `From ${dateFrom}`;
-  }
+  return 'All recorded dates'
+})
 
-  if (dateTo) {
-    return `Until ${dateTo}`;
-  }
-
-  return 'All recorded dates';
-});
+const pieChartColors = computed(() => {
+  return filteredPieChartData.value.map((d) => PIE_CHART_COLOR_MAP[d.label] || '#a3a3a3')
+})
 
 function formatCurrency(amount) {
   return new Intl.NumberFormat('en-PH', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-  }).format(Number(amount || 0));
+  }).format(Number(amount || 0))
 }
-
-
-const pieChartColors = computed(() => {
-  // Map each label to its color, in the same order as filteredPieChartData
-  const colorMap = {
-    'Total Income': '#2563eb', // blue-600
-    'Total Expense': '#dc2626', // red-600
-    'Total Revenue': '#16a34a', // green-600
-  };
-  return filteredPieChartData.value.map(d => colorMap[d.label] || '#a3a3a3');
-});
 
 function deleteTransaction(id) {
   if (confirm('Are you sure you want to delete this transaction?')) {
-    router.delete(route('transactions.destroy', id));
+    router.delete(route('transactions.destroy', id))
   }
 }
 
 onMounted(() => {
   setTimeout(() => {
-    tabLoading.value[tab.value] = false;
-  }, 1500);
-});
+    tabLoading.value[tab.value] = false
+  }, 1500)
+})
 </script>
 
 <style scoped>

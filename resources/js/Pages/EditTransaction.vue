@@ -121,49 +121,51 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { router } from '@inertiajs/vue3';
-import InputError from '@/Components/InputError.vue';
-import Modal from '@/Components/Modal.vue';
+import { ref } from 'vue'
+import { router } from '@inertiajs/vue3'
+import InputError from '@/Components/InputError.vue'
+import Modal from '@/Components/Modal.vue'
 
 const props = defineProps({
   transaction: Object,
   categories: {
-    type: Array,
-    default: () => ["Food", "Rent", "Leisure", "Bills"]
-  }
-});
+    type:    Array,
+    default: () => ['Food', 'Rent', 'Leisure', 'Bills'],
+  },
+})
 
-const emit = defineEmits(['close']);
+const emit = defineEmits(['close'])
 
 const form = ref({
   description: props.transaction.description,
-  amount: props.transaction.amount,
-  type: props.transaction.type,
-  category: props.transaction.category,
-  entry_date: props.transaction.entry_date,
-});
-const errors = ref({});
-const processing = ref(false);
+  amount:      props.transaction.amount,
+  type:        props.transaction.type,
+  category:    props.transaction.category,
+  entry_date:  props.transaction.entry_date,
+})
+
+const errors     = ref({})
+const processing = ref(false)
 
 function submit() {
-  processing.value = true;
+  processing.value = true
+
   router.put(route('transactions.update', props.transaction.id), form.value, {
     preserveScroll: true,
     onSuccess: () => {
-      errors.value = {};
-      processing.value = false;
-      emit('close');
+      errors.value     = {}
+      processing.value = false
+      emit('close')
     },
     onError: (e) => {
-      errors.value = e;
-      processing.value = false;
-    }
-  });
+      errors.value     = e
+      processing.value = false
+    },
+  })
 }
 
 function closeModal() {
-  emit('close');
+  emit('close')
 }
 </script>
 

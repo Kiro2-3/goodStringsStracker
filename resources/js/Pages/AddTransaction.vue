@@ -179,138 +179,137 @@
 </template>
 
 <script setup>
-import { ref, watch, computed } from 'vue';
-import axios from 'axios';
-import { router } from '@inertiajs/vue3';
-import InputError from '@/Components/InputError.vue';
-import Modal from '@/Components/Modal.vue';
+import { computed, ref, watch } from 'vue'
+import axios from 'axios'
+import { router } from '@inertiajs/vue3'
+import InputError from '@/Components/InputError.vue'
+import Modal from '@/Components/Modal.vue'
 
 const props = defineProps({
   categories: {
-    type: Array,
+    type:    Array,
     default: () => ['Food', 'Rent', 'Leisure', 'Bills'],
   },
   standalone: {
-    type: Boolean,
+    type:    Boolean,
     default: false,
   },
-});
+})
 
-const emit = defineEmits(['close']);
+const emit = defineEmits(['close'])
 
-const categories = ref([...props.categories]);
+const categories = ref([...props.categories])
 
 const form = ref({
   description: '',
-  amount: '',
-  type: 'expense',
-  category: 'Food',
-  entry_date: new Date().toISOString().split('T')[0],
-});
-const errors = ref({});
-const processing = ref(false);
+  amount:      '',
+  type:        'expense',
+  category:    'Food',
+  entry_date:  new Date().toISOString().split('T')[0],
+})
 
-const showCategoryModal = ref(false);
-const newCategory = ref('');
-const categoryError = ref('');
+const errors            = ref({})
+const processing        = ref(false)
+const showCategoryModal = ref(false)
+const newCategory       = ref('')
+const categoryError     = ref('')
 
-// Categories to use when type is expense (exclude 'Salary' if present)
-const expenseCategories = computed(() => categories.value.filter(cat => cat !== 'Salary'));
+const expenseCategories = computed(() => categories.value.filter((cat) => cat !== 'Salary'))
 
 watch(() => form.value.type, (newType) => {
   if (newType === 'income') {
-    form.value.category = 'Salary';
+    form.value.category = 'Salary'
   } else if (newType === 'expense' && form.value.category === 'Salary') {
-    form.value.category = 'Food';
+    form.value.category = 'Food'
   }
-});
+})
 
 function openCategoryModal() {
-  newCategory.value = '';
-  categoryError.value = '';
-  showCategoryModal.value = true;
+  newCategory.value     = ''
+  categoryError.value   = ''
+  showCategoryModal.value = true
 }
 
 function closeCategoryModal() {
-  showCategoryModal.value = false;
+  showCategoryModal.value = false
 }
 
 function saveCategory() {
-  const name = newCategory.value.trim();
+  const name = newCategory.value.trim()
+
   if (!name) {
-    categoryError.value = 'Category name is required.';
-    return;
+    categoryError.value = 'Category name is required.'
+    return
   }
+
   if (categories.value.includes(name)) {
-    categoryError.value = 'This category already exists.';
-    return;
+    categoryError.value = 'This category already exists.'
+    return
   }
-  categoryError.value = '';
+
+  categoryError.value = ''
 
   axios.post(route('categories.store'), { name })
     .then((response) => {
-      const savedName = response.data.name ?? name;
+      const savedName = response.data.name ?? name
       if (!categories.value.includes(savedName)) {
-        categories.value.push(savedName);
+        categories.value.push(savedName)
       }
-      form.value.category = savedName;
-      showCategoryModal.value = false;
+      form.value.category     = savedName
+      showCategoryModal.value = false
     })
     .catch((error) => {
-      if (error.response && error.response.data && error.response.data.errors && error.response.data.errors.name) {
-        categoryError.value = error.response.data.errors.name[0];
-      } else {
-        categoryError.value = 'Unable to save category.';
-      }
-    });
+      categoryError.value = error.response?.data?.errors?.name?.[0] ?? 'Unable to save category.'
+    })
 }
 
 function deleteCategory(name) {
   if (name === 'Salary') {
-    categoryError.value = 'The Salary category cannot be deleted.';
-    return;
+    categoryError.value = 'The Salary category cannot be deleted.'
+    return
   }
 
-  categories.value = categories.value.filter(cat => cat !== name);
+  categories.value = categories.value.filter((cat) => cat !== name)
 
   if (form.value.category === name) {
-    const fallback = categories.value.find(cat => cat !== 'Salary') || 'Food';
-    form.value.category = fallback;
+    const fallback      = categories.value.find((cat) => cat !== 'Salary') || 'Food'
+    form.value.category = fallback
   }
 
-  categoryError.value = '';
+  categoryError.value = ''
 }
 
 function submit() {
-  processing.value = true;
+  processing.value = true
+
   router.post(route('transactions.store'), form.value, {
     preserveScroll: true,
     onSuccess: () => {
       form.value = {
         description: '',
-        amount: '',
-        type: 'expense',
-        category: 'Food',
-        entry_date: new Date().toISOString().split('T')[0],
-      };
-      errors.value = {};
-      processing.value = false;
-      emit('close');
+        amount:      '',
+        type:        'expense',
+        category:    'Food',
+        entry_date:  new Date().toISOString().split('T')[0],
+      }
+      errors.value     = {}
+      processing.value = false
+      emit('close')
     },
     onError: (e) => {
-      errors.value = e;
-      processing.value = false;
-    }
-  });
+      errors.value     = e
+      processing.value = false
+    },
+  })
 }
 
 function closeModal() {
-  emit('close');
+  emit('close')
   if (props.standalone) {
     if (window.history.length > 1) {
-      router.back();
+      router.back()
     } else {
-      router.get(route('dashboard'));
+      router.get(route('dashboard'))
     }
   }
 }

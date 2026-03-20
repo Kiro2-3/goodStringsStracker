@@ -223,95 +223,91 @@
 </template>
 
 <script setup>
-import { ref, defineProps, watch } from 'vue';
-import { router, Head } from '@inertiajs/vue3';
-import AuthenticatedLayout from '../Layouts/AuthenticatedLayout.vue';
-import AppSidebar from '@/Components/AppSidebar.vue';
-import EditTransaction from './EditTransaction.vue';
-import AddTransaction from './AddTransaction.vue';
+import { ref, watch } from 'vue'
+import { Head, router } from '@inertiajs/vue3'
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
+import AppSidebar from '@/Components/AppSidebar.vue'
+import EditTransaction from '@/Pages/EditTransaction.vue'
+import AddTransaction from '@/Pages/AddTransaction.vue'
 
 const props = defineProps({
-  auth: Object,
+  auth:         Object,
   transactions: Object,
-  categories: Array,
-  filters: Object,
-});
+  categories:   Array,
+  filters:      Object,
+})
 
 const filters = ref({
-  search: props.filters?.search || '',
-  type: props.filters?.type || '',
-  category: props.filters?.category || '',
+  search:    props.filters?.search    || '',
+  type:      props.filters?.type      || '',
+  category:  props.filters?.category  || '',
   date_from: props.filters?.date_from || '',
-  date_to: props.filters?.date_to || '',
-});
+  date_to:   props.filters?.date_to   || '',
+})
 
-// Re-sync local filter state whenever Inertia delivers fresh props (including on initial render)
-watch(() => props.filters, (newFilters) => {
-  filters.value = {
-    search: newFilters?.search || '',
-    type: newFilters?.type || '',
-    category: newFilters?.category || '',
-    date_from: newFilters?.date_from || '',
-    date_to: newFilters?.date_to || '',
-  };
-}, { immediate: true });
+watch(
+  () => props.filters,
+  (newFilters) => {
+    filters.value = {
+      search:    newFilters?.search    || '',
+      type:      newFilters?.type      || '',
+      category:  newFilters?.category  || '',
+      date_from: newFilters?.date_from || '',
+      date_to:   newFilters?.date_to   || '',
+    }
+  },
+  { immediate: true },
+)
 
-const editTransaction = ref(null);
-const showAddTransaction = ref(false);
+const editTransaction    = ref(null)
+const showAddTransaction = ref(false)
 
 function openEditTransaction(transaction) {
-  editTransaction.value = { ...transaction };
-}
-
-function logout() {
-  router.post(route('logout'), {}, {
-    onSuccess: () => {
-      router.visit(route('login'));
-    },
-  });
+  editTransaction.value = { ...transaction }
 }
 
 function clearFilters() {
   filters.value = {
-    search: '',
-    type: '',
-    category: '',
+    search:    '',
+    type:      '',
+    category:  '',
     date_from: '',
-    date_to: '',
-  };
+    date_to:   '',
+  }
 
   router.get(route('transactions.recent'), {}, {
     preserveScroll: true,
-    replace: true,
-  });
+    replace:        true,
+  })
 }
 
 function applyFilters() {
   router.get(route('transactions.recent'), filters.value, {
-    preserveState: true,
+    preserveState:  true,
     preserveScroll: true,
-    replace: true,
-  });
+    replace:        true,
+  })
 }
 
 function deleteTransaction(id) {
   if (confirm('Are you sure you want to delete this transaction?')) {
     router.delete(route('transactions.destroy', id), {
       preserveScroll: true,
-    });
+    })
   }
 }
 
 function exportCsv() {
-  const params = new URLSearchParams();
-  if (filters.value.search) { params.set('search', filters.value.search); }
-  if (filters.value.type) { params.set('type', filters.value.type); }
-  if (filters.value.category) { params.set('category', filters.value.category); }
-  if (filters.value.date_from) { params.set('date_from', filters.value.date_from); }
-  if (filters.value.date_to) { params.set('date_to', filters.value.date_to); }
+  const params = new URLSearchParams()
 
-  const query = params.toString();
-  window.location.href = route('transactions.export-csv') + (query ? '?' + query : '');
+  if (filters.value.search)    params.set('search',    filters.value.search)
+  if (filters.value.type)      params.set('type',      filters.value.type)
+  if (filters.value.category)  params.set('category',  filters.value.category)
+  if (filters.value.date_from) params.set('date_from', filters.value.date_from)
+  if (filters.value.date_to)   params.set('date_to',   filters.value.date_to)
+
+  const query = params.toString()
+  window.location.href = route('transactions.export-csv') + (query ? '?' + query : '')
 }
 </script>
 
