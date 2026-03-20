@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -38,6 +39,14 @@ class HandleInertiaRequests extends Middleware
                 'success' => fn () => $request->session()->get('success'),
                 'error' => fn () => $request->session()->get('error'),
             ],
+            'recentTransactions' => fn () => $request->user()
+                ? Transaction::query()
+                    ->where('user_id', $request->user()->id)
+                    ->latest('entry_date')
+                    ->latest('id')
+                    ->limit(5)
+                    ->get(['id', 'description', 'amount', 'type', 'category', 'entry_date', 'created_at'])
+                : [],
         ];
     }
 }
