@@ -5,6 +5,7 @@
       <img src="/public/images/stracker-logo.png" alt="Stracker Logo" class="h-7 w-auto" />
       <span class="font-bold text-base tracking-tight text-base-content">Stracker</span>
     </div>
+    <NotificationPopover class="md:hidden" />
     <button type="button" class="btn btn-ghost btn-sm p-1" @click="mobileOpen = !mobileOpen" aria-label="Toggle menu">
       <svg v-if="!mobileOpen" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
@@ -203,6 +204,7 @@
 <script setup>
 import { ref } from 'vue';
 import { router } from '@inertiajs/vue3';
+import NotificationPopover from '@/Components/NotificationPopover.vue';
 
 defineProps({
   user: { type: Object, required: true },
