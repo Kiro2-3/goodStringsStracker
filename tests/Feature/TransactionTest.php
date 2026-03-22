@@ -168,14 +168,13 @@ test('dashboard returns correct summary and breakdown arrays', function () {
     $response = $this->actingAs($user)->get(route('dashboard'));
 
     $response->assertStatus(200);
-    $response->assertInertia(fn ($page) =>
-        $page->has('summary.income')
-             ->where('summary.income', 100)
-             ->has('summary.expense')
-             ->where('summary.expense', 50)
-             ->has('summary.balance')
-             ->where('summary.balance', 50)
-             ->has('categories')
-             ->etc()
+    $response->assertInertia(fn ($page) => $page->has('summary.income')
+        ->where('summary.income', 100)
+        ->has('summary.expense')
+        ->where('summary.expense', 50)
+        ->has('summary.balance')
+        ->where('summary.balance', 50)
+        ->has('categories')
+        ->etc()
     );
 });

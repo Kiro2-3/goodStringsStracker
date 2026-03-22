@@ -28,15 +28,15 @@ class TransactionController extends Controller
             ->paginate(10);
 
         $chartFilters = [
-            'category'  => $request->input('chart_category'),
-            'type'      => $request->input('chart_type'),
+            'category' => $request->input('chart_category'),
+            'type' => $request->input('chart_type'),
             'date_from' => $request->input('chart_date_from'),
-            'date_to'   => $request->input('chart_date_to'),
+            'date_to' => $request->input('chart_date_to'),
         ];
 
         $chartQuery = $this->applyChartFilters(Transaction::where('user_id', $user->id), $chartFilters);
 
-        $totalIncome  = (clone $chartQuery)->where('type', 'income')->sum('amount');
+        $totalIncome = (clone $chartQuery)->where('type', 'income')->sum('amount');
         $totalExpense = (clone $chartQuery)->where('type', 'expense')->sum('amount');
 
         $expenseData = (clone $chartQuery)
@@ -51,9 +51,9 @@ class TransactionController extends Controller
             ->groupBy('category')
             ->pluck('total', 'category');
 
-        $categories    = $expenseData->keys()->merge($incomeData->keys())->unique()->values();
+        $categories = $expenseData->keys()->merge($incomeData->keys())->unique()->values();
         $expenseTotals = $categories->map(fn ($c) => $expenseData->get($c, 0));
-        $incomeTotals  = $categories->map(fn ($c) => $incomeData->get($c, 0));
+        $incomeTotals = $categories->map(fn ($c) => $incomeData->get($c, 0));
 
         $chartTransactions = (clone $chartQuery)
             ->orderBy('entry_date')
@@ -84,25 +84,25 @@ class TransactionController extends Controller
             ->get()
             ->map(fn ($item) => [
                 'category' => $item->category,
-                'total'    => number_format((float) $item->total, 2, '.', ''),
+                'total' => number_format((float) $item->total, 2, '.', ''),
             ]);
 
         return Inertia::render('Dashboard', [
-            'auth'                  => ['user' => $user],
-            'transactions'          => $transactions,
-            'summary'               => [
-                'income'  => number_format($totalIncome, 2, '.', ''),
+            'auth' => ['user' => $user],
+            'transactions' => $transactions,
+            'summary' => [
+                'income' => number_format($totalIncome, 2, '.', ''),
                 'expense' => number_format($totalExpense, 2, '.', ''),
                 'balance' => number_format($totalIncome - $totalExpense, 2, '.', ''),
             ],
-            'categories'            => $allCategories,
+            'categories' => $allCategories,
             'transactionCategories' => $transactionCategories,
-            'expenseTotals'         => $expenseTotals,
-            'incomeTotals'          => $incomeTotals,
-            'chartTransactions'     => $chartTransactions,
-            'filters'               => $request->only(['category', 'type', 'date_from', 'date_to']),
-            'chartFilters'          => $chartFilters,
-            'topExpenseCategories'  => $topExpenseCategories,
+            'expenseTotals' => $expenseTotals,
+            'incomeTotals' => $incomeTotals,
+            'chartTransactions' => $chartTransactions,
+            'filters' => $request->only(['category', 'type', 'date_from', 'date_to']),
+            'chartFilters' => $chartFilters,
+            'topExpenseCategories' => $topExpenseCategories,
         ]);
     }
 
@@ -136,7 +136,7 @@ class TransactionController extends Controller
         $user = Auth::user();
 
         $allowedSorts = ['entry_date', 'description', 'category', 'amount', 'type'];
-        $sortBy  = in_array($request->input('sort_by'), $allowedSorts) ? $request->input('sort_by') : 'entry_date';
+        $sortBy = in_array($request->input('sort_by'), $allowedSorts) ? $request->input('sort_by') : 'entry_date';
         $sortDir = $request->input('sort_dir') === 'asc' ? 'asc' : 'desc';
 
         $query = $this->applyTransactionFilters(
@@ -153,10 +153,10 @@ class TransactionController extends Controller
         }
 
         return Inertia::render('RecentTransactions', [
-            'auth'         => ['user' => $user],
+            'auth' => ['user' => $user],
             'transactions' => $transactions,
-            'filters'      => $request->only(['search', 'type', 'category', 'date_from', 'date_to', 'sort_by', 'sort_dir']),
-            'categories'   => $categories,
+            'filters' => $request->only(['search', 'type', 'category', 'date_from', 'date_to', 'sort_by', 'sort_dir']),
+            'categories' => $categories,
         ]);
     }
 
@@ -165,14 +165,14 @@ class TransactionController extends Controller
      */
     public function store(StoreTransactionRequest $request): RedirectResponse
     {
-        $user      = Auth::user();
+        $user = Auth::user();
         $validated = $request->validated();
 
         $user->transactions()->create($validated);
 
         Category::firstOrCreate([
             'user_id' => $user->id,
-            'name'    => $validated['category'],
+            'name' => $validated['category'],
         ]);
 
         return redirect()->back(302, [], route('dashboard'))->with('success', 'Successfully added transaction');
@@ -193,7 +193,7 @@ class TransactionController extends Controller
 
         Category::firstOrCreate([
             'user_id' => $transaction->user_id,
-            'name'    => $validated['category'],
+            'name' => $validated['category'],
         ]);
 
         return redirect()->back(302, [], route('dashboard'))->with('success', 'Transaction updated successfully');
@@ -218,7 +218,7 @@ class TransactionController extends Controller
      */
     public function exportCsv(Request $request): \Symfony\Component\HttpFoundation\StreamedResponse
     {
-        $user  = Auth::user();
+        $user = Auth::user();
         $query = $this->applyTransactionFilters(Transaction::where('user_id', $user->id)->orderBy('entry_date', 'desc'), $request);
 
         $transactions = $query->get(['entry_date', 'description', 'category', 'amount', 'type']);
@@ -226,7 +226,7 @@ class TransactionController extends Controller
         $filename = 'transactions_' . now()->format('Y-m-d') . '.csv';
 
         $headers = [
-            'Content-Type'        => 'text/csv',
+            'Content-Type' => 'text/csv',
             'Content-Disposition' => "attachment; filename=\"{$filename}\"",
         ];
 

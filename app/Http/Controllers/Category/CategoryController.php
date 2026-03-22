@@ -49,8 +49,8 @@ class CategoryController extends Controller
     /**
      * Update an existing category.
      *
-     * @param  UpdateCategoryRequest $request the validated request data
-     * @param  Category              $category the category to update
+     * @param  UpdateCategoryRequest  $request  the validated request data
+     * @param  Category  $category  the category to update
      */
     public function update(UpdateCategoryRequest $request, Category $category): JsonResponse
     {
@@ -69,7 +69,7 @@ class CategoryController extends Controller
     /**
      * Delete an existing category.
      *
-     * @param  Category $category the category to delete
+     * @param  Category  $category  the category to delete
      */
     public function destroy(Category $category): RedirectResponse
     {
