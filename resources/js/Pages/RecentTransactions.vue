@@ -8,7 +8,7 @@
         @add-transaction="showAddTransaction = true"
       />
 
-      <main class="flex-1 space-y-10 px-4 md:px-12 py-8 w-full">
+      <main class="flex-1 min-w-0 space-y-10 px-4 md:px-12 py-8">
         <div class="card bg-base-100 border border-base-200 shadow-xl overflow-hidden">
           <!-- Filters -->
           <div class="card-body gap-4 border-b border-base-200">
@@ -232,11 +232,12 @@ import AddTransaction from '@/Pages/AddTransaction.vue'
 
 const props = defineProps({
   auth:         Object,
-  transactions: Object,
+  transactions: Object,   // paginated resource: { data, meta, links }
   categories:   Array,
-  filters:      Object,
+  filters:      Object,   // active filter values sent back from the server after a Search
 })
 
+// Local filter state mirrors the server-side filters so inputs stay reactive
 const filters = ref({
   search:    props.filters?.search    || '',
   type:      props.filters?.type      || '',
@@ -245,6 +246,7 @@ const filters = ref({
   date_to:   props.filters?.date_to   || '',
 })
 
+// Keep local filters in sync when Inertia navigates and the server sends updated props
 watch(
   () => props.filters,
   (newFilters) => {
@@ -259,13 +261,18 @@ watch(
   { immediate: true },
 )
 
-const editTransaction    = ref(null)
+const editTransaction    = ref(null)   // holds the transaction object being edited; null hides the modal
 const showAddTransaction = ref(false)
 
+// Spread into a new object so the form inside EditTransaction gets its own copy
 function openEditTransaction(transaction) {
   editTransaction.value = { ...transaction }
 }
 
+/**
+ * Clears all filter inputs and reloads the page without any query params,
+ * resetting to the default paginated view.
+ */
 function clearFilters() {
   filters.value = {
     search:    '',
@@ -277,10 +284,14 @@ function clearFilters() {
 
   router.get(route('transactions.recent'), {}, {
     preserveScroll: true,
-    replace:        true,
+    replace:        true,  // replace history entry so back button skips the cleared state
   })
 }
 
+/**
+ * Sends the current filter values as query params.
+ * preserveState keeps the sidebar and other reactive data intact during the request.
+ */
 function applyFilters() {
   router.get(route('transactions.recent'), filters.value, {
     preserveState:  true,
@@ -289,6 +300,7 @@ function applyFilters() {
   })
 }
 
+// Confirms before deleting; uses preserveScroll to keep the user's scroll position
 function deleteTransaction(id) {
   if (confirm('Are you sure you want to delete this transaction?')) {
     router.delete(route('transactions.destroy', id), {
@@ -297,6 +309,10 @@ function deleteTransaction(id) {
   }
 }
 
+/**
+ * Builds a CSV download URL from the active filter state and triggers a full
+ * page navigation (not Inertia) so the browser receives the file download response.
+ */
 function exportCsv() {
   const params = new URLSearchParams()
 

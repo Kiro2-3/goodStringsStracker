@@ -11,7 +11,7 @@
       />
 
       <!-- Main content -->
-      <main class="flex-1 px-4 md:px-12 py-8 w-full">
+      <main class="flex-1 min-w-0 px-4 md:px-12 py-8">
         <div class="card bg-base-100 border border-base-200 shadow-xl overflow-hidden">
           <!-- Header -->
           <div class="p-6 border-b border-base-200 flex items-center justify-between">
@@ -205,13 +205,16 @@ const props = defineProps({
   flash:      { type: Object, default: () => ({}) },
 })
 
+// Local copy of the categories list; mutated optimistically so the UI stays snappy
+// without waiting for a full Inertia page reload after each change
 const localCategories    = ref([...props.categories])
 const showAddTransaction = ref(false)
 
+// ─── Add Category ─────────────────────────────────────────────────────────────
 const showAddModal    = ref(false)
 const newCategoryName = ref('')
 const addError        = ref('')
-const saving          = ref(false)
+const saving          = ref(false)   // disables the Save button while the axios request is in-flight
 
 function openAddModal() {
   newCategoryName.value = ''
@@ -223,6 +226,10 @@ function closeAddModal() {
   showAddModal.value = false
 }
 
+/**
+ * Validates uniqueness (case-insensitive) before POSTing to the server.
+ * On success, inserts the new category into the local list and re-sorts alphabetically.
+ */
 function saveCategory() {
   const name = newCategoryName.value.trim()
 
@@ -253,8 +260,9 @@ function saveCategory() {
     })
 }
 
+// ─── Edit Category ────────────────────────────────────────────────────────────
 const showEditModal    = ref(false)
-const categoryToEdit   = ref(null)
+const categoryToEdit   = ref(null)   // the category object currently being edited
 const editCategoryName = ref('')
 const editError        = ref('')
 const editing          = ref(false)
@@ -271,6 +279,10 @@ function closeEditModal() {
   categoryToEdit.value = null
 }
 
+/**
+ * Validates uniqueness (excluding the current category being edited) before
+ * sending a PUT request; mutates the local list entry on success.
+ */
 function saveEdit() {
   const name = editCategoryName.value.trim()
 
@@ -308,19 +320,24 @@ function saveEdit() {
     })
 }
 
-const categoryToDelete = ref(null)
+// ─── Delete Category ──────────────────────────────────────────────────────────
+const categoryToDelete = ref(null)   // set to the target category to open the confirm modal
 
 function confirmDelete(cat) {
   categoryToDelete.value = cat
 }
 
+/**
+ * Deletes the confirmed category via Inertia DELETE.
+ * Existing transactions keep the category string as a plain label even after deletion.
+ */
 function deleteCategory() {
   const cat = categoryToDelete.value
   if (!cat) {
     return
   }
 
-  categoryToDelete.value = null
+  categoryToDelete.value = null  // close the confirmation modal before the request
 
   router.delete(route('categories.destroy', cat.id), {
     preserveScroll: true,

@@ -11,7 +11,7 @@
       />
 
       <!-- Main content -->
-      <main class="flex-1 px-4 md:px-12 py-8 w-full space-y-6">
+      <main class="flex-1 min-w-0 px-4 md:px-12 py-8 space-y-6">
         <!-- Flash success -->
         <div v-if="status === 'profile-updated'" class="alert alert-success shadow">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -203,34 +203,39 @@ import AddTransaction from '@/Pages/AddTransaction.vue';
 
 const props = defineProps({
   auth: Object,
-  mustVerifyEmail: Boolean,
-  status: String,
+  mustVerifyEmail: Boolean,  // when true, shows an email-verification notice
+  status: String,            // server feedback key: 'profile-updated' | 'password-updated'
 });
 
+// useForm provides .processing, .errors, .patch/.put/.delete helpers with Inertia integration
 const profileForm = useForm({
   name: props.auth.user.name,
   email: props.auth.user.email,
 });
 
+// Separate form for account deletion (requires password for safety)
 const deleteForm = useForm({
   password: '',
 });
 
-const showDeleteModal = ref(false);
-const showAddTransaction = ref(false);
+const showDeleteModal   = ref(false)
+const showAddTransaction = ref(false)
 
+// Separate form keeps password change errors isolated from profile errors
 const passwordForm = useForm({
   current_password: '',
   password: '',
   password_confirmation: '',
 });
 
+// Resets password fields after a successful update so they don't linger in the form
 function submitPassword() {
   passwordForm.put(route('password.update'), {
     onSuccess: () => passwordForm.reset(),
   });
 }
 
+// PATCH is used because only name/email change; not a full resource replacement
 function submitProfile() {
   profileForm.patch(route('profile.update'));
 }
@@ -243,6 +248,7 @@ function logout() {
   });
 }
 
+// Requires password confirmation before permanently deleting the account
 function submitDelete() {
   deleteForm.delete(route('profile.destroy'), {
     onSuccess: () => {

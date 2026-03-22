@@ -10,6 +10,8 @@
 </template>
 
 <script setup>
+// type: defaults to 'button' so it won't accidentally submit enclosing forms
+// disabled: greys out the button and prevents clicks
 defineProps({
   type: { type: String, default: 'button' },
   disabled: Boolean

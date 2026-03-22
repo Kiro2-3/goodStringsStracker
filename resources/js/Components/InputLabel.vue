@@ -7,6 +7,7 @@
 </template>
 
 <script setup>
+// value: fallback text when no slot content is provided
 defineProps({
   value: String
 });

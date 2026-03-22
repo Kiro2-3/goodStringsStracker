@@ -9,6 +9,7 @@
 
 <script setup>
 import { Link } from '@inertiajs/vue3';
+// active: highlights this nav item when it matches the current page (mobile nav)
 defineProps({
   active: Boolean
 });

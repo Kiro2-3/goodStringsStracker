@@ -54,13 +54,20 @@ const props = defineProps({
   header: String
 })
 
+// Access reactive Inertia page props shared on every server response
 const page   = usePage()
 const user   = computed(() => page.props.auth.user)
-const flash  = computed(() => page.props.flash || {})
+const flash  = computed(() => page.props.flash || {})  // server flash messages (success, error, etc.)
 const showingNavigationDropdown = ref(false)
 const showFlash                 = ref(false)
-let flashTimeout = null
+let flashTimeout = null  // holds the auto-hide timer so it can be cleared on component unmount
 
+/**
+ * Watches the flash prop for new success messages.
+ * A brief delay before showing prevents the transition from skipping
+ * when Inertia replaces props immediately after a redirect.
+ * The toast auto-dismisses after 3 seconds.
+ */
 watch(
   () => page.props.flash,
   (flashObj) => {
@@ -78,6 +85,7 @@ watch(
   { immediate: true },
 )
 
+// Clean up the timer to prevent state updates after the component is destroyed
 onUnmounted(() => {
   if (flashTimeout) clearTimeout(flashTimeout)
 })

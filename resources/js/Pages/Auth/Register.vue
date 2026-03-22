@@ -174,20 +174,24 @@
 <script setup>
 import { ref } from 'vue'
 import { Head, Link, useForm } from '@inertiajs/vue3'
+// Images are imported as URLs so Vite resolves and fingerprints them at build time
 import logoUrl from '@/../../public/images/stracker-logo.png'
 import previewUrl from '@/../../public/images/frontview2.png'
 import InputError from '@/Components/InputError.vue'
 import TextInput from '@/Components/TextInput.vue'
 
+// Modal starts open so the registration form is immediately visible on page load
 const showModal = ref(true)
 
+// useForm tracks field values, validation errors, and in-flight state
 const form = useForm({
   name:                  '',
   email:                 '',
   password:              '',
-  password_confirmation: '',
+  password_confirmation: '',  // must match 'password'; validated server-side
 })
 
+// Clears both password fields after every attempt so they never linger in form state
 function submit() {
   form.post('/register', {
     onFinish: () => form.reset('password', 'password_confirmation'),

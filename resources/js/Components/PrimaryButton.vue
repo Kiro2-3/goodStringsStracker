@@ -9,6 +9,7 @@
 </template>
 
 <script setup>
+// disabled: greys out the button and prevents clicks (used during form submissions)
 defineProps({
   disabled: Boolean
 });

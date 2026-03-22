@@ -33,9 +33,9 @@
 import { Head, Link } from '@inertiajs/vue3'
 
 const props = defineProps({
-  auth:          Object,
-  laravelVersion: String,
-  phpVersion:    String,
+  auth:           Object,   // contains auth.user; if truthy, shows "Dashboard" link instead of login/register
+  laravelVersion: String,   // displayed in the footer info block
+  phpVersion:     String,   // displayed alongside laravelVersion
 })
 </script>
 

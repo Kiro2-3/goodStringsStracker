@@ -35,17 +35,22 @@
 <script setup>
 import { Dialog, DialogPanel, TransitionRoot, TransitionChild } from '@headlessui/vue';
 import { computed } from 'vue';
+
 const props = defineProps({
-  show: Boolean,
-  maxWidth: { type: String, default: '2xl' },
-  closeable: { type: Boolean, default: true },
-  onClose: { type: Function, default: () => {} }
+  show: Boolean,                          // controls whether the modal is visible
+  maxWidth: { type: String, default: '2xl' },  // responsive max-width key (sm|md|lg|xl|2xl)
+  closeable: { type: Boolean, default: true }, // when false, clicking outside or pressing Esc does nothing
+  onClose: { type: Function, default: () => {} }  // callback invoked when the modal requests to close
 });
+
+// Only invoke the close callback when the modal is configured as closeable
 const close = () => {
   if (props.closeable) {
     props.onClose();
   }
 };
+
+// Map the maxWidth string to the corresponding Tailwind responsive class
 const maxWidthClass = computed(() => {
   return {
     sm: 'sm:max-w-sm',

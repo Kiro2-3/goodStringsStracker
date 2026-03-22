@@ -186,20 +186,25 @@ import InputError from '@/Components/InputError.vue'
 import Modal from '@/Components/Modal.vue'
 
 const props = defineProps({
+  // categories: list of expense categories passed from the server
   categories: {
     type:    Array,
     default: () => ['Food', 'Rent', 'Leisure', 'Bills'],
   },
+  // standalone: when true (opened as its own page), closeModal navigates back instead of just emitting
   standalone: {
     type:    Boolean,
     default: false,
   },
 })
 
+// Emits 'close' so the parent page can hide this modal
 const emit = defineEmits(['close'])
 
+// Local copy of categories so the user can add/delete categories within the session without a full reload
 const categories = ref([...props.categories])
 
+// Form state with today's date pre-selected for convenience
 const form = ref({
   description: '',
   amount:      '',
@@ -208,19 +213,21 @@ const form = ref({
   entry_date:  new Date().toISOString().split('T')[0],
 })
 
-const errors            = ref({})
+const errors            = ref({})   // server-side validation errors keyed by field name
 const processing        = ref(false)
 const showCategoryModal = ref(false)
 const newCategory       = ref('')
 const categoryError     = ref('')
 
+// Exclude 'Salary' from expense category options since it is reserved for income type
 const expenseCategories = computed(() => categories.value.filter((cat) => cat !== 'Salary'))
 
+// Auto-update category when the type changes to keep form state consistent
 watch(() => form.value.type, (newType) => {
   if (newType === 'income') {
-    form.value.category = 'Salary'
+    form.value.category = 'Salary'                     // income is always categorised as Salary
   } else if (newType === 'expense' && form.value.category === 'Salary') {
-    form.value.category = 'Food'
+    form.value.category = 'Food'                       // reset to a valid expense category
   }
 })
 
@@ -234,6 +241,11 @@ function closeCategoryModal() {
   showCategoryModal.value = false
 }
 
+/**
+ * POSTs a new category to the server via axios (not Inertia) to avoid a full
+ * page reload; on success, adds the new name to the local categories list and
+ * pre-selects it in the form.
+ */
 function saveCategory() {
   const name = newCategory.value.trim()
 
@@ -263,6 +275,11 @@ function saveCategory() {
     })
 }
 
+/**
+ * Removes a category from the local list.
+ * 'Salary' cannot be deleted because it is the mandatory income category.
+ * If the deleted category was selected, falls back to the first available expense category.
+ */
 function deleteCategory(name) {
   if (name === 'Salary') {
     categoryError.value = 'The Salary category cannot be deleted.'
@@ -279,6 +296,11 @@ function deleteCategory(name) {
   categoryError.value = ''
 }
 
+/**
+ * Submits the new transaction via Inertia POST.
+ * On success, resets the form and closes the modal.
+ * On error, surfaces validation messages next to each field.
+ */
 function submit() {
   processing.value = true
 
@@ -303,6 +325,10 @@ function submit() {
   })
 }
 
+/**
+ * Closes the modal.
+ * In standalone mode (own page), navigates back so the browser history is clean.
+ */
 function closeModal() {
   emit('close')
   if (props.standalone) {

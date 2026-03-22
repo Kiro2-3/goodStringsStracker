@@ -9,7 +9,7 @@
         @add-transaction="showAddTransaction = true"
       />
 
-      <main class="flex-1 space-y-6 px-4 md:px-10 py-8 w-full">
+      <main class="flex-1 min-w-0 space-y-6 px-4 md:px-10 py-8">
         <template v-if="tab === 'dashboard'">
           <div v-if="tabLoading.dashboard" class="space-y-5 animate-pulse">
             <!-- Summary Cards Skeleton -->
@@ -213,6 +213,7 @@ import AddTransaction from '@/Pages/AddTransaction.vue'
 import LineChart from '@/Components/LineChart.vue'
 import PieChart from '@/Components/PieChart.vue'
 
+// Maps pie chart slice labels to fixed brand colours for consistency
 const PIE_CHART_COLOR_MAP = {
   'Total Income':  '#2563eb',
   'Total Expense': '#dc2626',
@@ -222,19 +223,20 @@ const PIE_CHART_COLOR_MAP = {
 const props = defineProps({
   auth:                 Object,
   transactions:         Object,
-  summary:              Object,
+  summary:              Object,           // pre-computed totals from server (income, expense, balance)
   categories:           Array,
-  transactionCategories: Array,
+  transactionCategories: Array,           // distinct categories present in the user's transactions
   expenseTotals:        Array,
   incomeTotals:         Array,
-  chartTransactions:    Array,
+  chartTransactions:    Array,            // full transaction list used for client-side chart filtering
 })
 
 const showAddTransaction = ref(false)
-const editTransaction    = ref(null)
+const editTransaction    = ref(null)    // holds the transaction being edited; null hides the modal
 const tab                = ref('dashboard')
-const tabLoading         = ref({ dashboard: true })
+const tabLoading         = ref({ dashboard: true })  // controls the animated skeleton while loading
 
+// Client-side filter state for the charts (does NOT trigger a server request)
 const chartFilters = ref({
   type:      '',
   category:  '',
@@ -255,22 +257,27 @@ function logout() {
 }
 
 function selectTab(target) {
+  // Avoid re-rendering if the tab is already active
   if (tab.value === target) {
     return
   }
   tab.value = target
   tabLoading.value[target] = true
+  // Short delay simulates a loading phase for a smoother perceived transition
   setTimeout(() => {
     tabLoading.value[target] = false
   }, 1500)
 }
 
+// Count of active non-empty filter values; used to show a "filters active" badge
 const activeChartFilterCount = computed(() => {
   return Object.values(chartFilters.value).filter((value) => value !== '').length
 })
 
+// Use the distinct categories from the user's own transactions when available
 const chartCategoryOptions = computed(() => props.transactionCategories ?? props.categories)
 
+// When the type is switched to income, clear the category filter (income has no sub-categories)
 watch(
   () => chartFilters.value.type,
   (newType) => {
@@ -280,11 +287,13 @@ watch(
   },
 )
 
+// Resets all chart filters and reloads the dashboard from the server
 function clearChartFilters() {
   chartFilters.value = { type: '', category: '', date_from: '', date_to: '' }
   router.get(route('dashboard'))
 }
 
+// Filters the raw transaction list client-side based on the chart filter state
 const filteredChartTransactions = computed(() => {
   return (props.chartTransactions || []).filter((t) => {
     if (chartFilters.value.type && t.type !== chartFilters.value.type) return false
@@ -295,6 +304,10 @@ const filteredChartTransactions = computed(() => {
   })
 })
 
+/**
+ * Aggregates filtered transactions by date for the line chart.
+ * Produces an array of { date, income, expense } sorted chronologically.
+ */
 const filteredLineData = computed(() => {
   const dateMap = {}
   filteredChartTransactions.value.forEach((t) => {
@@ -309,6 +322,10 @@ const filteredLineData = computed(() => {
   return Object.values(dateMap).sort((a, b) => a.date.localeCompare(b.date))
 })
 
+/**
+ * Builds the pie chart dataset with three slices: Income, Expense, Revenue.
+ * Slices with zero income/expense are omitted to keep the chart clean.
+ */
 const filteredPieChartData = computed(() => {
   let totalIncome  = 0
   let totalExpense = 0
@@ -331,6 +348,7 @@ const filteredPieChartData = computed(() => {
   return data
 })
 
+// Summary cards reflect the currently filtered dataset (not the server-side pre-computed summary)
 const summaryForDisplay = computed(() => {
   let income  = 0
   let expense = 0
@@ -352,6 +370,7 @@ const summaryForDisplay = computed(() => {
   }
 })
 
+// Human-readable label for the active date range shown in the chart header
 const chartDateRangeLabel = computed(() => {
   const { date_from: dateFrom, date_to: dateTo } = chartFilters.value
 
@@ -362,10 +381,12 @@ const chartDateRangeLabel = computed(() => {
   return 'All recorded dates'
 })
 
+// Maps each pie slice to its fixed colour via PIE_CHART_COLOR_MAP; grey fallback for unknowns
 const pieChartColors = computed(() => {
   return filteredPieChartData.value.map((d) => PIE_CHART_COLOR_MAP[d.label] || '#a3a3a3')
 })
 
+// Formats a number as Philippine Peso with locale-aware thousand separators
 function formatCurrency(amount) {
   return new Intl.NumberFormat('en-PH', {
     minimumFractionDigits: 2,
@@ -379,11 +400,15 @@ function deleteTransaction(id) {
   }
 }
 
+// Simulate a 1.5 s load phase on initial mount to show the skeleton screens
 onMounted(() => {
   setTimeout(() => {
     tabLoading.value[tab.value] = false
   }, 1500)
 })
+
+
+
 </script>
 
 <style scoped>

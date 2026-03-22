@@ -9,6 +9,7 @@
 
 <script setup>
 import { Link } from '@inertiajs/vue3';
+// active: adds the btn-active class to visually highlight the current page link
 defineProps({
   active: Boolean
 });

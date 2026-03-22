@@ -14,6 +14,8 @@
 </template>
 
 <script setup>
+// GuestLayout wraps unauthenticated pages (login, register).
+// Renders a centered card with the app logo linking back to the home page.
 import { Link } from '@inertiajs/vue3'
 import ApplicationLogo from '@/Components/ApplicationLogo.vue'
 </script>

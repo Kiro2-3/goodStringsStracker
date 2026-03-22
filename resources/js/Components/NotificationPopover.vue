@@ -105,13 +105,16 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { usePage, router } from '@inertiajs/vue3'
 
-const open = ref(false)
-const containerRef = ref(null)
+const open         = ref(false)  // controls popover visibility
+const containerRef = ref(null)   // ref to the wrapper div; used to detect outside clicks
 
+// Access the shared Inertia page props to read recently added transactions
 const page = usePage()
 
+// recentTransactions is injected server-side via Inertia's shared props on every request
 const items = computed(() => page.props.recentTransactions ?? [])
 
+// Formats a numeric amount with locale-aware thousand separators and 2 decimal places
 function formatAmount(amount) {
   return new Intl.NumberFormat(undefined, {
     minimumFractionDigits: 2,
@@ -119,17 +122,20 @@ function formatAmount(amount) {
   }).format(amount)
 }
 
+// Closes the popover then navigates to the full transactions list page
 function goToTransactions() {
   open.value = false
   router.get(route('transactions.recent'))
 }
 
+// Closes the popover when a click is detected outside the container element
 function handleClickOutside(event) {
   if (containerRef.value && !containerRef.value.contains(event.target)) {
     open.value = false
   }
 }
 
+// Attach / remove the global click listener to avoid memory leaks
 onMounted(() => document.addEventListener('mousedown', handleClickOutside))
 onUnmounted(() => document.removeEventListener('mousedown', handleClickOutside))
 </script>

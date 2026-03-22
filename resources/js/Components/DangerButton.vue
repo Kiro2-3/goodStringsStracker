@@ -9,6 +9,7 @@
 </template>
 
 <script setup>
+// Accepts a disabled prop to visually grey out the button and block clicks
 defineProps({
   disabled: Boolean
 });
