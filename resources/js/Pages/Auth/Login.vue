@@ -1,14 +1,17 @@
 <template>
   <Head title="Log in" />
   <div class="login-bg">
-    <div
-      v-if="status"
-      class="toast toast-top toast-end z-50"
-    >
-      <div class="alert alert-success" role="alert">
+    <!-- Success toast (e.g. after password-reset email sent) -->
+    <div v-if="status" class="toast toast-top toast-end z-50">
+      <div class="alert alert-success shadow-lg" role="alert">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
         <span>{{ status }}</span>
       </div>
     </div>
+
+
 
     <div class="login-hero-shell" style="position: relative; overflow: hidden;">
       <span class="hero-sliding-text">sTrike your Finance!</span>
@@ -293,7 +296,6 @@
                 class="input input-bordered w-full"
                 required
               />
-              <InputError :message="form.errors.email" class="mt-1 text-error text-xs" />
             </div>
 
             <!-- Password -->
@@ -306,7 +308,7 @@
                   v-model="form.password"
                   autocomplete="current-password"
                   placeholder="Password"
-                  class="input input-bordered w-full pr-10"
+                  :class="['input input-bordered w-full pr-10', { 'input-error': form.errors.email }]"
                   required
                 />
                 <!-- Toggle password visibility -->
@@ -327,7 +329,7 @@
                   </svg>
                 </button>
               </div>
-              <InputError :message="form.errors.password" class="mt-1 text-error text-xs" />
+              <InputError :message="form.errors.email" class="mt-2" />
             </div>
 
             <!-- Remember + Forgot -->
@@ -342,6 +344,23 @@
                 class="link link-primary text-sm font-medium"
               >Forgot Password?</Link>
             </div>
+
+            <!-- Inline credential error -->
+            <transition
+              enter-active-class="transition ease-out duration-200"
+              enter-from-class="opacity-0 -translate-y-1"
+              enter-to-class="opacity-100 translate-y-0"
+              leave-active-class="transition ease-in duration-150"
+              leave-from-class="opacity-100 translate-y-0"
+              leave-to-class="opacity-0 -translate-y-1"
+            >
+              <p v-if="showErrorToast" class="flex items-center gap-1.5 text-sm text-red-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+                </svg>
+                Invalid email or password. Please try again.
+              </p>
+            </transition>
 
             <!-- Submit -->
             <button
@@ -445,8 +464,10 @@ const form = useForm({
 })
 
 // Modal starts open so the login dialog is visible immediately on page load
-const showLoginModal = ref(true)
-const showPassword   = ref(false)  // toggles password field between 'text' and 'password' type
+const showLoginModal  = ref(true)
+const showPassword    = ref(false)   // toggles password field between 'text' and 'password' type
+const showErrorToast  = ref(false)   // shown when the server rejects credentials
+let   errorToastTimer = null         // auto-dismiss timer handle
 
 function openLoginModal() {
   showLoginModal.value = true
@@ -457,9 +478,15 @@ function closeLoginModal() {
 }
 
 // Clears the password field after every attempt so it never lingers in form state
+// Shows an error toast for 4 seconds when the server returns a credential error
 function submit() {
   form.post('/login', {
     onFinish: () => form.reset('password'),
+    onError: () => {
+      showErrorToast.value = true
+      if (errorToastTimer) clearTimeout(errorToastTimer)
+      errorToastTimer = setTimeout(() => { showErrorToast.value = false }, 4000)
+    },
   })
 }
 </script>

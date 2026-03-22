@@ -78,6 +78,18 @@ class TransactionController extends Controller
             ->orderBy('category')
             ->pluck('category');
 
+        $topExpenseCategories = $user->transactions()
+            ->where('type', 'expense')
+            ->selectRaw('category, sum(amount) as total')
+            ->groupBy('category')
+            ->orderByDesc('total')
+            ->limit(5)
+            ->get()
+            ->map(fn ($item) => [
+                'category' => $item->category,
+                'total'    => number_format((float) $item->total, 2, '.', ''),
+            ]);
+
         return Inertia::render('Dashboard', [
             'auth'                  => ['user' => $user],
             'transactions'          => $transactions,
@@ -93,6 +105,7 @@ class TransactionController extends Controller
             'chartTransactions'     => $chartTransactions,
             'filters'               => $request->only(['category', 'type', 'date_from', 'date_to']),
             'chartFilters'          => $chartFilters,
+            'topExpenseCategories'  => $topExpenseCategories,
         ]);
     }
 
