@@ -223,7 +223,7 @@ class TransactionController extends Controller
 
         $transactions = $query->get(['entry_date', 'description', 'category', 'amount', 'type']);
 
-        $filename = 'transactions_' . now()->format('Y-m-d') . '.csv';
+        $filename = 'transactions_'.now()->format('Y-m-d').'.csv';
 
         $headers = [
             'Content-Type' => 'text/csv',
