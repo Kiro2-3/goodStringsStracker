@@ -51,6 +51,56 @@
                 <span v-if="profileForm.errors.email" class="label-text-alt text-error">{{ profileForm.errors.email }}</span>
               </label>
 
+              <label class="form-control w-full gap-1">
+                <span class="label-text font-semibold">Currency</span>
+                <select
+                  v-model="profileForm.currency"
+                  class="select select-bordered w-full bg-base-100"
+                  required
+                >
+                  <option value="AED">🇦🇪 AED – UAE Dirham</option>
+                  <option value="AUD">🇦🇺 AUD – Australian Dollar</option>
+                  <option value="BDT">🇧🇩 BDT – Bangladeshi Taka</option>
+                  <option value="BRL">🇧🇷 BRL – Brazilian Real</option>
+                  <option value="CAD">🇨🇦 CAD – Canadian Dollar</option>
+                  <option value="CHF">🇨🇭 CHF – Swiss Franc</option>
+                  <option value="CNY">🇨🇳 CNY – Chinese Yuan</option>
+                  <option value="COP">🇨🇴 COP – Colombian Peso</option>
+                  <option value="DKK">🇩🇰 DKK – Danish Krone</option>
+                  <option value="EGP">🇪🇬 EGP – Egyptian Pound</option>
+                  <option value="EUR">🇪🇺 EUR – Euro</option>
+                  <option value="GBP">🇬🇧 GBP – British Pound</option>
+                  <option value="HKD">🇭🇰 HKD – Hong Kong Dollar</option>
+                  <option value="IDR">🇮🇩 IDR – Indonesian Rupiah</option>
+                  <option value="ILS">🇮🇱 ILS – Israeli Shekel</option>
+                  <option value="INR">🇮🇳 INR – Indian Rupee</option>
+                  <option value="JPY">🇯🇵 JPY – Japanese Yen</option>
+                  <option value="KRW">🇰🇷 KRW – South Korean Won</option>
+                  <option value="KWD">🇰🇼 KWD – Kuwaiti Dinar</option>
+                  <option value="MXN">🇲🇽 MXN – Mexican Peso</option>
+                  <option value="MYR">🇲🇾 MYR – Malaysian Ringgit</option>
+                  <option value="NGN">🇳🇬 NGN – Nigerian Naira</option>
+                  <option value="NOK">🇳🇴 NOK – Norwegian Krone</option>
+                  <option value="NZD">🇳🇿 NZD – New Zealand Dollar</option>
+                  <option value="PHP">🇵🇭 PHP – Philippine Peso</option>
+                  <option value="PKR">🇵🇰 PKR – Pakistani Rupee</option>
+                  <option value="PLN">🇵🇱 PLN – Polish Złoty</option>
+                  <option value="QAR">🇶🇦 QAR – Qatari Riyal</option>
+                  <option value="RUB">🇷🇺 RUB – Russian Ruble</option>
+                  <option value="SAR">🇸🇦 SAR – Saudi Riyal</option>
+                  <option value="SEK">🇸🇪 SEK – Swedish Krona</option>
+                  <option value="SGD">🇸🇬 SGD – Singapore Dollar</option>
+                  <option value="THB">🇹🇭 THB – Thai Baht</option>
+                  <option value="TRY">🇹🇷 TRY – Turkish Lira</option>
+                  <option value="TWD">🇹🇼 TWD – Taiwan Dollar</option>
+                  <option value="UAH">🇺🇦 UAH – Ukrainian Hryvnia</option>
+                  <option value="USD">🇺🇸 USD – US Dollar</option>
+                  <option value="VND">🇻🇳 VND – Vietnamese Dong</option>
+                  <option value="ZAR">🇿🇦 ZAR – South African Rand</option>
+                </select>
+                <span v-if="profileForm.errors.currency" class="label-text-alt text-error">{{ profileForm.errors.currency }}</span>
+              </label>
+
               <div class="flex justify-end">
                 <button type="submit" class="btn btn-primary" :disabled="profileForm.processing">
                   Save Changes
@@ -205,6 +255,7 @@ const props = defineProps({
   auth: Object,
   mustVerifyEmail: Boolean,  // when true, shows an email-verification notice
   status: String,            // server feedback key: 'profile-updated' | 'password-updated'
+  userCurrency: String,
 });
 
 // Auto-dismiss the inline status alert after 5 seconds so it never gets stuck
@@ -231,6 +282,7 @@ onUnmounted(() => { if (statusTimer) clearTimeout(statusTimer) })
 const profileForm = useForm({
   name: props.auth.user.name,
   email: props.auth.user.email,
+  currency: props.userCurrency ?? 'PHP',
 });
 
 // Separate form for account deletion (requires password for safety)

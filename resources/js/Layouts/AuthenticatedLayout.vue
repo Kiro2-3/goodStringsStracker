@@ -42,11 +42,6 @@
       </div>
     </header>
 
-    <!-- Notification bell: fixed top-right on desktop, hidden on mobile (shown in mobile navbar) -->
-    <div class="hidden md:block fixed top-4 right-4 z-50">
-      <NotificationPopover />
-    </div>
-
     <main><slot /></main>
   </div>
 </template>
@@ -60,7 +55,6 @@ import DropdownLink from '@/Components/DropdownLink.vue'
 import NavLink from '@/Components/NavLink.vue'
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue'
 import ThemeToggle from '@/Components/ThemeToggle.vue'
-import NotificationPopover from '@/Components/NotificationPopover.vue'
 
 const props = defineProps({
   header: String
