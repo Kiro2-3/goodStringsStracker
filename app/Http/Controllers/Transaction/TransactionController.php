@@ -196,7 +196,7 @@ class TransactionController extends Controller
             'name' => $validated['category'],
         ]);
 
-        return redirect()->back(302, [], route('dashboard'))->with('success', 'Transaction updated successfully');
+        return redirect()->route('transactions.recent')->with('success', 'Transaction updated successfully');
     }
 
     /**
@@ -210,7 +210,7 @@ class TransactionController extends Controller
 
         $transaction->delete();
 
-        return redirect()->back(302, [], route('dashboard'))->with('success', 'Successfully deleted transaction');
+        return redirect()->route('transactions.recent')->with('success', 'Successfully deleted transaction');
     }
 
     /**
@@ -233,7 +233,7 @@ class TransactionController extends Controller
         $count = $query->count();
         $query->delete();
 
-        return redirect()->back(302, [], route('dashboard'))->with('success', "Successfully deleted {$count} transaction(s)");
+        return redirect()->route('transactions.recent')->with('success', "Successfully deleted {$count} transaction(s)");
     }
 
     /**

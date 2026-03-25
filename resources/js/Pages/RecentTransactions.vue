@@ -330,6 +330,8 @@ function bulkDelete() {
     preserveScroll: true,
     onSuccess: () => {
       selectedIds.value = []
+      // reload to reflect deletions
+      router.reload()
     },
   })
 }
@@ -401,6 +403,9 @@ function deleteTransaction(id) {
   if (confirm('Are you sure you want to delete this transaction?')) {
     router.delete(route('transactions.destroy', id), {
       preserveScroll: true,
+      onSuccess: () => {
+        router.reload()
+      },
     })
   }
 }
