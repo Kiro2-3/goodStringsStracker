@@ -47,7 +47,7 @@
 </template>
 
 <script setup>
-import { computed, nextTick, onUnmounted, ref, watch } from 'vue'
+import { computed, nextTick, onUnmounted, ref, watch, onMounted } from 'vue'
 import { Link, router, usePage } from '@inertiajs/vue3'
 import ApplicationLogo from '@/Components/ApplicationLogo.vue'
 import Dropdown from '@/Components/Dropdown.vue'
@@ -97,6 +97,35 @@ watch(
 // Clean up the timer to prevent state updates after the component is destroyed
 onUnmounted(() => {
   if (flashTimeout) clearTimeout(flashTimeout)
+})
+
+// Initialize theme early on layout mount to avoid FOUC between light/dark
+onMounted(() => {
+  try {
+    const stored = localStorage.getItem('theme')
+    if (stored === 'dark') {
+      document.documentElement.classList.add('dark')
+      try { document.documentElement.setAttribute('data-theme', 'dark') } catch (e) {}
+      try { document.body.classList.remove('bg-base-200','bg-base-100'); document.body.classList.add('bg-base-300') } catch (e) {}
+    } else if (stored === 'light') {
+      document.documentElement.classList.remove('dark')
+      try { document.documentElement.setAttribute('data-theme', 'purplegold') } catch (e) {}
+      try { document.body.classList.remove('bg-base-300','bg-base-100'); document.body.classList.add('bg-base-200') } catch (e) {}
+    } else {
+      // no stored preference: respect system preference
+      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.documentElement.classList.add('dark')
+        try { document.documentElement.setAttribute('data-theme', 'dark') } catch (e) {}
+        try { document.body.classList.remove('bg-base-200','bg-base-100'); document.body.classList.add('bg-base-300') } catch (e) {}
+      } else {
+        document.documentElement.classList.remove('dark')
+        try { document.documentElement.setAttribute('data-theme', 'purplegold') } catch (e) {}
+        try { document.body.classList.remove('bg-base-300','bg-base-100'); document.body.classList.add('bg-base-200') } catch (e) {}
+      }
+    }
+  } catch (e) {
+    // ignore
+  }
 })
 </script>
 

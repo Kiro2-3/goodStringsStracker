@@ -376,7 +376,7 @@ function sortBy(column) {
   filters.value.sort_by  = column
   filters.value.sort_dir = newDir
   router.get(route('transactions.recent'), filters.value, {
-    preserveState:  true,
+    preserveState:  false,
     preserveScroll: true,
     replace:        true,
   })
@@ -409,7 +409,7 @@ function clearFilters() {
  */
 function applyFilters() {
   router.get(route('transactions.recent'), filters.value, {
-    preserveState:  true,
+    preserveState:  false,
     preserveScroll: true,
     replace:        true,
   })

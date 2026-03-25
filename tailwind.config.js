@@ -51,6 +51,7 @@ export default {
                     'error': '#b91c1c',
                 },
             },
+            'dark',
         ],
     },
 };

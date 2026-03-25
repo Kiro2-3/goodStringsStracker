@@ -2,7 +2,7 @@
   <AuthenticatedLayout :user="auth.user">
     <Head title="Stracker" />
     
-    <div class="min-h-screen w-full flex flex-col md:flex-row bg-gray-100 text-gray-900">
+    <div class="min-h-screen w-full flex flex-col md:flex-row bg-base-200 text-base-content">
       <AppSidebar
         :user="auth.user"
         active-page="dashboard"
@@ -14,43 +14,43 @@
           <div v-if="tabLoading.dashboard" class="space-y-5 animate-pulse">
             <!-- Summary Cards Skeleton -->
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-5 w-full">
-              <div class="bg-white rounded-xl shadow p-6 border border-gray-100 w-full">
-                <div class="h-3 bg-gray-200 rounded w-1/3 mb-3"></div>
-                <div class="h-7 bg-gray-200 rounded w-1/2"></div>
+              <div class="rounded-xl shadow p-6 border border-base-200 bg-base-100 w-full">
+                <div class="h-3 bg-base-200 rounded w-1/3 mb-3"></div>
+                <div class="h-7 bg-base-200 rounded w-1/2"></div>
               </div>
-              <div class="bg-white rounded-xl shadow p-6 border border-gray-100 w-full">
-                <div class="h-3 bg-gray-200 rounded w-1/3 mb-3"></div>
-                <div class="h-7 bg-gray-200 rounded w-1/2"></div>
+              <div class="rounded-xl shadow p-6 border border-base-200 bg-base-100 w-full">
+                <div class="h-3 bg-base-200 rounded w-1/3 mb-3"></div>
+                <div class="h-7 bg-base-200 rounded w-1/2"></div>
               </div>
-              <div class="bg-white rounded-xl shadow p-6 border border-gray-100 w-full">
-                <div class="h-3 bg-gray-200 rounded w-1/3 mb-3"></div>
-                <div class="h-7 bg-gray-200 rounded w-1/2"></div>
+              <div class="rounded-xl shadow p-6 border border-base-200 bg-base-100 w-full">
+                <div class="h-3 bg-base-200 rounded w-1/3 mb-3"></div>
+                <div class="h-7 bg-base-200 rounded w-1/2"></div>
               </div>
             </div>
 
             <!-- Chart Filters Skeleton -->
-            <div class="bg-white rounded-xl shadow border border-gray-100 w-full p-4">
+            <div class="rounded-xl shadow border border-base-200 w-full p-4 bg-base-100">
               <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 gap-2">
                 <div class="h-4 bg-gray-200 rounded w-32"></div>
                 <div class="h-3 bg-gray-200 rounded w-16"></div>
               </div>
               <div class="flex flex-col sm:flex-row flex-wrap gap-3 items-stretch">
-                <div class="h-8 bg-gray-200 rounded w-full sm:w-36"></div>
-                <div class="h-8 bg-gray-200 rounded w-full sm:w-36"></div>
-                <div class="h-8 bg-gray-200 rounded w-full sm:w-36"></div>
-                <div class="h-8 bg-gray-200 rounded w-full sm:w-36"></div>
+                <div class="h-8 bg-base-200 rounded w-full sm:w-36"></div>
+                <div class="h-8 bg-base-200 rounded w-full sm:w-36"></div>
+                <div class="h-8 bg-base-200 rounded w-full sm:w-36"></div>
+                <div class="h-8 bg-base-200 rounded w-full sm:w-36"></div>
               </div>
             </div>
 
             <!-- Charts Skeleton -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
-              <div class="bg-white rounded-xl shadow border border-gray-100 h-64 p-5 w-full flex flex-col gap-3">
-                <div class="h-4 bg-gray-200 rounded w-40"></div>
-                <div class="flex-1 bg-gray-100 rounded"></div>
+              <div class="rounded-xl shadow border border-base-200 h-64 p-5 w-full flex flex-col gap-3 bg-base-100">
+                <div class="h-4 bg-base-200 rounded w-40"></div>
+                <div class="flex-1 bg-base-200 rounded"></div>
               </div>
-              <div class="bg-white rounded-xl shadow border border-gray-100 h-64 p-5 w-full flex flex-col gap-3">
-                <div class="h-4 bg-gray-200 rounded w-40"></div>
-                <div class="flex-1 bg-gray-100 rounded"></div>
+              <div class="rounded-xl shadow border border-base-200 h-64 p-5 w-full flex flex-col gap-3 bg-base-100">
+                <div class="h-4 bg-base-200 rounded w-40"></div>
+                <div class="flex-1 bg-base-200 rounded"></div>
               </div>
             </div>
           </div>

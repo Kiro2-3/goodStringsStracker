@@ -170,6 +170,21 @@
           </div>
         </div>
 
+        <!-- Appearance Card -->
+        <div class="card bg-base-100 border border-base-200 shadow-xl">
+          <div class="card-body gap-5">
+            <div>
+              <h2 class="text-lg font-bold text-base-content">Appearance</h2>
+              <p class="text-sm text-base-content/60 mt-0.5">Toggle dark mode for the app UI.</p>
+            </div>
+
+            <div class="flex items-center justify-between">
+              <p class="text-sm text-base-content/80">Theme</p>
+              <ThemeToggle />
+            </div>
+          </div>
+        </div>
+
         <!-- Danger Zone Card -->
         <div class="card bg-base-100 border border-base-200 shadow-xl">
           <div class="card-body gap-5">
@@ -249,6 +264,7 @@ import { router, useForm, Head } from '@inertiajs/vue3';
 import AuthenticatedLayout from '../../Layouts/AuthenticatedLayout.vue';
 import AppSidebar from '@/Components/AppSidebar.vue';
 import AddTransaction from '@/Pages/AddTransaction.vue';
+import ThemeToggle from '@/Components/ThemeToggle.vue';
 import { useCurrency } from '@/composables/useCurrency.js';
 
 const props = defineProps({
