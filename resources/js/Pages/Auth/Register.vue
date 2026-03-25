@@ -175,7 +175,7 @@
 import { ref } from 'vue'
 import { Head, Link, useForm } from '@inertiajs/vue3'
 // Images are imported as URLs so Vite resolves and fingerprints them at build time
-import logoUrl from '@/../../public/images/stracker-logo.png'
+import logoUrl from '@/../../public/images/str.png'
 import previewUrl from '@/../../public/images/frontview2.png'
 import InputError from '@/Components/InputError.vue'
 import TextInput from '@/Components/TextInput.vue'

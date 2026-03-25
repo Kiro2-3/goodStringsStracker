@@ -4,7 +4,7 @@
   <!-- Mobile top navbar (visible only below md breakpoint) -->
   <div class="md:hidden fixed top-0 left-0 right-0 z-30 bg-base-100 border-b border-base-200 shadow-sm flex items-center justify-between px-4 py-3">
     <div class="flex items-center gap-2">
-      <img src="/public/images/stracker-logo.png" alt="Stracker Logo" class="h-7 w-auto" />
+      <img src="/public/images/str.png" alt="Stracker Logo" class="h-7 w-auto" />
       <span class="font-bold text-base tracking-tight text-base-content">Stracker</span>
     </div>
     <div class="flex items-center gap-2">
@@ -49,7 +49,7 @@
       <!-- Drawer header -->
       <div class="flex items-center justify-between px-5 py-4 border-b border-base-200 shrink-0">
         <div class="flex items-center gap-2">
-          <img src="/public/images/stracker-logo.png" alt="Stracker Logo" class="h-7 w-auto" />
+          <img src="/public/images/str.png" alt="Stracker Logo" class="h-7 w-auto" />
           <span class="font-bold text-base tracking-tight text-base-content">Stracker</span>
         </div>
         <button type="button" class="btn btn-ghost btn-sm p-1" @click="mobileOpen = false" aria-label="Close menu">
@@ -153,7 +153,7 @@
   >
     <!-- Logo area -->
     <div class="flex items-center gap-3 px-4 py-4 border-b border-base-200 shrink-0 min-w-0">
-      <img src="/public/images/stracker-logo.png" alt="Stracker Logo" class="h-8 w-8 shrink-0" />
+      <img src="/public/images/str.png" alt="Stracker Logo" class="h-8 w-8 shrink-0" />
       <!-- Brand name fades in when expanded -->
       <transition
         enter-active-class="transition-all duration-200 ease-out"
