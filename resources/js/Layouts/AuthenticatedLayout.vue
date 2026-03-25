@@ -51,7 +51,7 @@
       </div>
       <transition name="fade">
         <div v-if="showMascot" class="mascot-bubble">
-          <div class="mascot-bubble-text">How can I help you today?</div>
+          <ChatBot />
         </div>
       </transition>
     </div>
@@ -67,6 +67,7 @@ import DropdownLink from '@/Components/DropdownLink.vue'
 import NavLink from '@/Components/NavLink.vue'
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue'
 import ThemeToggle from '@/Components/ThemeToggle.vue'
+import ChatBot from '@/Components/ChatBot.vue'
 import { onBeforeUnmount } from 'vue'
 
 const props = defineProps({
@@ -177,15 +178,11 @@ onBeforeUnmount(() => {
 .mascot-bubble {
   margin-bottom: 0.5rem;
   transform: translateY(-8px);
-  background: linear-gradient(90deg,#7c3aed,#f59e0b);
-  color: white;
-  padding: 0.5rem 0.75rem;
-  border-radius: 9999px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
-  white-space: nowrap;
-  font-weight: 600;
-  font-size: 0.95rem;
-  display: inline-block;
+  padding: 0; /* let ChatBot control padding */
+  border-radius: 12px;
+  box-shadow: 0 12px 40px rgba(2,6,23,0.18);
+  display: block;
+  max-width: 92vw;
 }
 .fade-enter-active, .fade-leave-active { transition: opacity 0.15s ease, transform 0.15s ease }
 .fade-enter-from { opacity: 0; transform: translateY(6px) }
