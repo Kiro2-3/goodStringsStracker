@@ -20,11 +20,42 @@ class CategoryController extends Controller
     public function index(): Response
     {
         $user = Auth::user();
-        $categories = $user->categories()->orderBy('name')->get(['id', 'name']);
+        $query = $user->categories()->select(['id', 'name']);
+
+        // Filters
+        $search = request()->query('search', '');
+        $sortBy = request()->query('sort_by', 'name');
+        $sortDir = request()->query('sort_dir', 'asc');
+
+        if ($search) {
+            $query->where('name', 'like', "%{$search}%");
+        }
+
+        // Allow only name sorting for categories for now
+        if (! in_array($sortBy, ['name'])) {
+            $sortBy = 'name';
+        }
+
+        $sortDir = $sortDir === 'desc' ? 'desc' : 'asc';
+
+        $query->orderBy($sortBy, $sortDir);
+
+        // paginate the categories to mirror transactions UI (10 per page)
+        $perPage = 10;
+        $categories = $query->paginate($perPage)->withQueryString();
+
+        // total count (useful for clients that need an absolute count regardless of paginator meta)
+        $totalCount = $user->categories()->count();
 
         return Inertia::render('Categories', [
             'auth' => ['user' => $user],
             'categories' => $categories,
+            'total_count' => $totalCount,
+            'filters' => [
+                'search' => $search,
+                'sort_by' => $sortBy,
+                'sort_dir' => $sortDir,
+            ],
         ]);
     }
 

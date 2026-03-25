@@ -30,6 +30,49 @@
             </button>
           </div>
 
+          <!-- Filters -->
+          <div class="card-body gap-4 border-b border-base-200">
+            <div class="flex flex-col gap-4 md:flex-row md:items-end">
+              <label class="form-control w-full md:flex-1 gap-2">
+                <span class="label-text font-semibold text-base-content">Search</span>
+                <input
+                  id="filter-search"
+                  type="text"
+                  v-model="filters.search"
+                  placeholder="Search category name"
+                  class="input input-bordered w-full bg-base-100 text-base-content"
+                />
+              </label>
+
+              <label class="form-control w-full md:w-40 gap-2">
+                <span class="label-text font-semibold text-base-content">Sort</span>
+                <select id="filter-sort-dir" v-model="filters.sort_dir" class="select select-bordered w-full bg-base-100 text-base-content">
+                  <option value="asc">Name ↑</option>
+                  <option value="desc">Name ↓</option>
+                </select>
+              </label>
+
+              <div class="flex w-full flex-col gap-1 md:w-auto">
+                <span class="invisible label-text">a</span>
+                <button type="button" @click="applyFilters" class="btn btn-primary">
+                  Search
+                </button>
+              </div>
+              <div class="flex w-full flex-col gap-1 md:w-auto">
+                <span class="invisible label-text">a</span>
+                <button type="button" @click="clearFilters" class="btn btn-ghost">
+                  Clear
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Debug (enable by adding ?debug=1 to the URL) -->
+          <div v-if="showDebug" class="p-4 bg-base-100 border-b border-base-200 text-xs">
+            <strong class="mb-2 block">Debug: categories prop / total_count</strong>
+            <pre class="whitespace-pre-wrap text-sm">{{ debugData }}</pre>
+          </div>
+
           <!-- Table -->
           <div class="overflow-x-auto">
             <table class="table table-zebra w-full">
@@ -76,6 +119,17 @@
                 </tr>
               </tbody>
             </table>
+          </div>
+          <!-- Pagination -->
+          <div v-if="hasMultiplePages" class="flex items-center justify-between px-4 py-3 border-t border-base-200">
+            <span class="text-sm text-base-content/60">
+              Page {{ displayCurrentPage }} of {{ displayLastPage }}
+              &nbsp;·&nbsp; {{ displayTotal }} total
+            </span>
+            <div class="flex gap-2">
+              <button class="btn btn-sm btn-outline" :disabled="displayCurrentPage <= 1" @click="goToPage(displayCurrentPage - 1)">← Prev</button>
+              <button class="btn btn-sm btn-primary" :disabled="displayCurrentPage >= displayLastPage" @click="goToPage(displayCurrentPage + 1)">Next →</button>
+            </div>
           </div>
         </div>
       </main>
@@ -187,7 +241,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed, watch } from 'vue'
 import axios from 'axios'
 import { Head, router } from '@inertiajs/vue3'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
@@ -196,13 +250,26 @@ import AddTransaction from '@/Pages/AddTransaction.vue'
 
 const props = defineProps({
   auth:       { type: Object, required: true },
-  categories: { type: Array,  default: () => [] },
+  // categories can be either an Array (legacy) or a paginated object { data, meta, links }
+  categories: { type: [Array, Object],  default: () => [] },
   flash:      { type: Object, default: () => ({}) },
+  filters:    { type: Object, default: () => ({}) },
+  total_count: { type: Number, default: 0 },
 })
 
-// Local copy of the categories list; mutated optimistically so the UI stays snappy
-// without waiting for a full Inertia page reload after each change
-const localCategories    = ref([...props.categories])
+const categoriesProp = props.categories
+
+// Local copy of the categories list; if server provides a paginator use its `data` page
+const localCategories = ref(props.categories?.data ? [...props.categories.data] : [...(props.categories || [])])
+
+// keep localCategories in sync when server sends new data (pagination/search)
+watch(
+  () => props.categories,
+  (newVal) => {
+    localCategories.value = newVal?.data ? [...newVal.data] : [...(newVal || [])]
+  },
+  { immediate: true }
+)
 const showAddTransaction = ref(false)
 
 // ─── Add Category ─────────────────────────────────────────────────────────────
@@ -336,6 +403,79 @@ function deleteCategory() {
 
   router.delete(route('categories.destroy', cat.id), {
     preserveScroll: true,
+    onSuccess: () => {
+      // after delete, remove from local list if present
+      localCategories.value = localCategories.value.filter(c => c.id !== cat.id)
+    }
   })
+}
+
+// --- Filters (server-driven) -------------------------------------------------
+const filters = ref({
+  search:   props.filters?.search || '',
+  sort_by:  props.filters?.sort_by || 'name',
+  sort_dir: props.filters?.sort_dir || 'asc',
+})
+
+function applyFilters() {
+  router.get(route('categories.index'), filters.value, {
+    preserveState: true,
+    preserveScroll: true,
+    replace: true,
+  })
+}
+
+function goToPage(page) {
+  const params = { ...filters.value, page }
+  router.get(route('categories.index'), params, {
+    // don't preserve component state so server paginator metadata replaces props
+    preserveState: false,
+    preserveScroll: true,
+  })
+}
+
+// Fallback helpers for pagination when the server doesn't send paginator metadata
+const currentPage = computed(() => {
+  const qs = new URLSearchParams(window.location.search)
+  const p = Number(qs.get('page'))
+  return Number.isInteger(p) && p > 0 ? p : 1
+})
+
+const hasMultiplePages = computed(() => {
+  if (categoriesProp && categoriesProp.meta) {
+    return categoriesProp.meta.last_page > 1
+  }
+  // fallback using server-provided absolute count if available
+  const totalCount = props.total_count || 0
+  if (totalCount && totalCount > 10) {
+    return true
+  }
+
+  // final fallback: if the current visible list already has >= 10 items
+  return Array.isArray(localCategories.value) && localCategories.value.length >= 10
+})
+
+const showDebug = computed(() => new URLSearchParams(window.location.search).get('debug') === '1')
+
+const debugData = computed(() => JSON.stringify({ categories: categoriesProp, total_count: totalCount }, null, 2))
+
+const displayCurrentPage = computed(() => {
+  return categoriesProp?.meta?.current_page ?? currentPage.value
+})
+
+const displayLastPage = computed(() => {
+  if (categoriesProp?.meta?.last_page) return categoriesProp.meta.last_page
+  if (props.total_count && props.total_count > 0) return Math.max(1, Math.ceil(props.total_count / 10))
+  return Math.max(1, Math.ceil((localCategories.value?.length || 0) / 10))
+})
+
+const displayTotal = computed(() => {
+  if (categoriesProp?.meta?.total) return categoriesProp.meta.total
+  if (props.total_count) return props.total_count
+  return localCategories.value?.length || 0
+})
+function clearFilters() {
+  filters.value = { search: '', sort_by: 'name', sort_dir: 'asc' }
+  router.get(route('categories.index'), {}, { preserveState: true, replace: true })
 }
 </script>

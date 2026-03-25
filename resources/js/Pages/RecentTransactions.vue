@@ -255,7 +255,7 @@
 </template>
 
 <script setup>
-import { ref, watch, computed } from 'vue'
+import { ref, watch, computed, nextTick } from 'vue'
 import { Head, router } from '@inertiajs/vue3'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import AppSidebar from '@/Components/AppSidebar.vue'
@@ -271,6 +271,19 @@ const props = defineProps({
 
 // expose a local `transactions` binding for template/script convenience
 const transactions = props.transactions
+
+// visibleTransactions holds a local, reactive copy of the current page's data
+// so we can optimistically remove rows immediately when the user deletes them.
+const visibleTransactions = ref((transactions?.data) ? [...transactions.data] : [])
+
+// Keep visibleTransactions in sync when the server sends new paginated data
+watch(
+  () => transactions?.data,
+  (newData) => {
+    visibleTransactions.value = newData ? [...newData] : []
+  },
+  { immediate: true }
+)
 
 // Local filter state mirrors the server-side filters so inputs stay reactive
 const filters = ref({
@@ -307,12 +320,12 @@ const showAddTransaction = ref(false)
 const selectedIds = ref([])
 
 const allSelected = computed(() => {
-  const idsOnPage = (transactions?.data || []).map(t => t.id)
+  const idsOnPage = (visibleTransactions.value || []).map(t => t.id)
   return idsOnPage.length > 0 && idsOnPage.every(id => selectedIds.value.includes(id))
 })
 
 function toggleSelectAll() {
-  const idsOnPage = (transactions?.data || []).map(t => t.id)
+  const idsOnPage = (visibleTransactions.value || []).map(t => t.id)
   if (allSelected.value) {
     // remove page ids from selection
     selectedIds.value = selectedIds.value.filter(id => !idsOnPage.includes(id))
@@ -326,11 +339,15 @@ function bulkDelete() {
   if (selectedIds.value.length === 0) return
   if (!confirm(`Delete ${selectedIds.value.length} selected transaction(s)? This cannot be undone.`)) return
 
-  router.post(route('transactions.bulk-delete'), { ids: selectedIds.value }, {
+  // optimistic removal from visibleTransactions for snappy UI
+  const idsToRemove = Array.from(selectedIds.value)
+  visibleTransactions.value = visibleTransactions.value.filter(t => !idsToRemove.includes(t.id))
+  selectedIds.value = []
+
+  router.post(route('transactions.bulk-delete'), { ids: idsToRemove }, {
     preserveScroll: true,
-    onSuccess: () => {
-      selectedIds.value = []
-      // reload to reflect deletions
+    onError: () => {
+      // if server fails, reload to restore proper state
       router.reload()
     },
   })
@@ -401,9 +418,13 @@ function applyFilters() {
 // Confirms before deleting; uses preserveScroll to keep the user's scroll position
 function deleteTransaction(id) {
   if (confirm('Are you sure you want to delete this transaction?')) {
+    // optimistic remove
+    visibleTransactions.value = visibleTransactions.value.filter(t => t.id !== id)
+
     router.delete(route('transactions.destroy', id), {
       preserveScroll: true,
-      onSuccess: () => {
+      onError: () => {
+        // restore from server if delete failed
         router.reload()
       },
     })
