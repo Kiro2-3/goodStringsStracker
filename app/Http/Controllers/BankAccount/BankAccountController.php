@@ -34,7 +34,7 @@ class BankAccountController
 
         $user->bankAccounts()->create($validated);
 
-        return redirect()->route('bank-accounts.index');
+        return redirect()->route('bank-accounts.index')->with('success', 'Bank account added successfully.');
     }
     /**
      * Show the Bank Accounts page.
