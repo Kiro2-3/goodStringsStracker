@@ -226,15 +226,11 @@ function confirmDelete() {
   if (!editAccount.value || !editAccount.value.id) return
   if (!confirm('Are you sure you want to delete this bank account? This action cannot be undone.')) return
 
+  // close modal immediately for a snappier UX, then perform delete
+  closeModal()
+
   router.delete(route('bank-accounts.destroy', editAccount.value.id), {}, {
     preserveScroll: true,
-    onSuccess: () => {
-      closeModal()
-    },
-    onFinish: () => {
-      // ensure modal is closed after request completes
-      closeModal()
-    },
     onError: (errors) => {
       console.error('Error deleting bank account:', errors)
     },
