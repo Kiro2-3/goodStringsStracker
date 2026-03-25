@@ -211,6 +211,10 @@ function saveEdit() {
     onSuccess: () => {
       closeModal()
     },
+    onFinish: () => {
+      // ensure modal is closed after request completes
+      closeModal()
+    },
     onError: (errors) => {
       // optionally surface validation errors later
       console.error('Validation errors updating bank account:', errors)
@@ -225,6 +229,10 @@ function confirmDelete() {
   router.delete(route('bank-accounts.destroy', editAccount.value.id), {}, {
     preserveScroll: true,
     onSuccess: () => {
+      closeModal()
+    },
+    onFinish: () => {
+      // ensure modal is closed after request completes
       closeModal()
     },
     onError: (errors) => {
