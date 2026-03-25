@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
+use Illuminate\Support\Facades\Log;
 
 class TransactionController extends Controller
 {
@@ -135,6 +136,9 @@ class TransactionController extends Controller
     {
         $user = Auth::user();
 
+        // Log incoming request params to diagnose filtering issues
+        Log::debug('RecentTransactions request', $request->all());
+
         $allowedSorts = ['entry_date', 'description', 'category', 'amount', 'type'];
         $sortBy = in_array($request->input('sort_by'), $allowedSorts) ? $request->input('sort_by') : 'entry_date';
         $sortDir = $request->input('sort_dir') === 'asc' ? 'asc' : 'desc';
@@ -143,6 +147,13 @@ class TransactionController extends Controller
             Transaction::where('user_id', $user->id)->orderBy($sortBy, $sortDir),
             $request
         );
+
+        // Log the SQL and bindings for the built query
+        try {
+            Log::debug('RecentTransactions SQL', ['sql' => $query->toSql(), 'bindings' => $query->getBindings()]);
+        } catch (\Throwable $e) {
+            Log::debug('RecentTransactions SQL inspect failed', ['error' => $e->getMessage()]);
+        }
 
         $transactions = $query->paginate(10)->withQueryString();
 
