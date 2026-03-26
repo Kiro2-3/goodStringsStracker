@@ -6,13 +6,15 @@
         <AppSidebar :user="auth.user" active-page="bank-accounts" />
       </div>
       <main class="flex-1 min-w-0 px-4 md:px-12 py-8">
-        <button
-          @click="openAddModal"
-          aria-label="Add Bank Account"
-          class="fixed z-50 right-4 bottom-6 md:top-6 md:right-6 md:bottom-auto rounded-full md:rounded shadow-lg px-4 py-3 text-white border-0 bg-gradient-to-r from-purple-600 to-amber-300 hover:from-purple-700 hover:to-amber-400"
-        >
-          Add Bank Account
-        </button>
+        <div class="flex justify-end mb-6">
+          <button
+            @click="openAddModal"
+            aria-label="Add Bank Account"
+            class="rounded-full md:rounded shadow-lg px-4 py-3 text-white border-0 bg-gradient-to-r from-purple-600 to-amber-300 hover:from-purple-700 hover:to-amber-400"
+          >
+            Add Bank Account
+          </button>
+        </div>
         <div class="max-w-full mx-auto grid grid-cols-1 md:grid-cols-12 gap-8">
           <!-- Balance Bar Chart Card -->
           <div class="w-full md:col-span-8">
@@ -42,6 +44,26 @@
                   <div class="text-lg font-medium">{{ props.bankAccounts && props.bankAccounts.total ? props.bankAccounts.total : (accounts.length || 0) }}</div>
                 </div>
               </div>
+            </div>
+
+            <!-- Upcoming Recurring Payments Timeline Card -->
+            <div class="card bg-base-100 border border-base-200 shadow p-4 mb-6">
+              <h3 class="text-lg font-semibold mb-3">Upcoming Recurring Payments</h3>
+              <div v-if="upcomingItems && upcomingItems.length" class="flex flex-col gap-3">
+                <ul class="overflow-y-auto">
+                  <li v-for="item in upcomingItems" :key="item.id" class="flex items-start gap-3 py-2">
+                    <div class="w-16 text-xs text-base-content/60">{{ formatDate(item.date) }}</div>
+                    <div class="flex-1">
+                      <div class="flex items-center justify-between">
+                        <div class="text-sm font-medium">{{ item.description || 'Subscription' }}</div>
+                        <div class="text-sm font-semibold">{{ formatCurrency(item.amount) }}</div>
+                      </div>
+                      <div class="text-xs text-base-content/60">From: {{ item.account_name || getAccountName(item.account_id) || '—' }}</div>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+              <div v-else class="text-sm text-base-content/60">No recurring payments due in the next 7 days.</div>
             </div>
 
             <div v-if="accounts && accounts.length" class="card bg-base-100 border border-base-200 shadow p-4 h-[440px] flex flex-col">
@@ -182,6 +204,10 @@ const props = defineProps({
   auth: Object,
   bankAccounts: Object,
   totalBalance: Number,
+  upcomingRecurring: {
+    type: Array,
+    default: () => [],
+  },
 })
 
 const form = ref({
@@ -210,6 +236,25 @@ const accounts = computed(() => {
   if (!props.bankAccounts) return []
   return Array.isArray(props.bankAccounts) ? props.bankAccounts : (props.bankAccounts.data || [])
 })
+
+// Upcoming recurring items passed from backend (or empty)
+const upcomingItems = computed(() => {
+  return props.upcomingRecurring || []
+})
+
+function formatDate(d) {
+  if (!d) return ''
+  try {
+    return new Date(d).toLocaleDateString()
+  } catch (e) {
+    return d
+  }
+}
+
+function getAccountName(id) {
+  const acc = accounts.value.find(a => a.id === id)
+  return acc ? (acc.account_name || acc.bank_name) : null
+}
 
 // Chart setup
 const balanceChart = ref(null)

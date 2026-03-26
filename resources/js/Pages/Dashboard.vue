@@ -359,11 +359,8 @@ function openEditTransaction(transaction) {
 }
 
 function logout() {
-  router.post(route('logout'), {}, {
-    onSuccess: () => {
-      router.visit(route('login'))
-    },
-  })
+  // ask the mascot to confirm logout
+  window.dispatchEvent(new Event('request-logout-confirm'))
 }
 
 function selectTab(target) {

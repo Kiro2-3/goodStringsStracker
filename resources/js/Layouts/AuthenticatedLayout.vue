@@ -45,13 +45,34 @@
     <main><slot /></main>
     <!-- Floating mascot helper -->
     <div class="mascot-wrapper" v-cloak>
-      <div class="mascot-badge" @click="toggleMascot" role="button" aria-label="Open help">Do you need help?</div>
+      <div class="mascot-badge" @click="toggleMascot" role="button" aria-label="Open help">
+        <div class="whitespace-nowrap">Hi do you need help?</div>
+      </div>
       <div class="mascot-button" @click="toggleMascot" role="button" aria-label="Open help">
         <img src="/public/images/mascot1.png" alt="Mascot" class="mascot-img" />
       </div>
       <transition name="fade">
         <div v-if="showMascot" class="mascot-bubble">
           <ChatBot />
+        </div>
+      </transition>
+
+      <!-- Centered logout confirmation modal -->
+      <transition name="fade">
+        <div v-if="pendingLogout" class="fixed inset-0 z-50 flex items-center justify-center">
+          <div class="absolute inset-0 bg-black/50" @click="cancelLogout"></div>
+          <div class="relative bg-base-100 rounded-lg shadow-2xl p-6 w-full max-w-md z-10">
+            <div class="flex flex-col md:flex-row items-center md:items-start gap-4">
+              <div class="flex-1">
+                <div class="text-sm text-base-content/70">Glad to have you here{{ user && user.name ? (', ' + user.name.split(' ')[0]) : '' }}! See ya around!</div>
+                <div class="mt-4 flex justify-end gap-2">
+                  <button class="btn btn-ghost btn-sm" @click="cancelLogout">Cancel</button>
+                  <button class="btn btn-error btn-sm" @click="confirmLogout">Log out</button>
+                </div>
+              </div>
+              <img src="/public/images/sadmascot.png" alt="Mascot" class="w-28 h-44 md:w-36 md:h-56 rounded md:ml-4 md:order-2 mascot-modal-img" />
+            </div>
+          </div>
         </div>
       </transition>
     </div>
@@ -144,8 +165,28 @@ onMounted(() => {
 
 // Mascot helper state and handlers
 const showMascot = ref(false)
+const pendingLogout = ref(false)
 function toggleMascot() {
   showMascot.value = !showMascot.value
+}
+
+function requestLogout() {
+  pendingLogout.value = true
+  showMascot.value = true
+}
+
+function confirmLogout() {
+  // perform the actual logout
+  router.post(route('logout'), {}, {
+    onSuccess: () => {
+      router.visit(route('login'))
+    },
+  })
+}
+
+function cancelLogout() {
+  pendingLogout.value = false
+  showMascot.value = false
 }
 
 function onKeydown(e) {
@@ -153,8 +194,10 @@ function onKeydown(e) {
 }
 
 window.addEventListener('keydown', onKeydown)
+window.addEventListener('request-logout-confirm', requestLogout)
 onBeforeUnmount(() => {
   window.removeEventListener('keydown', onKeydown)
+  window.removeEventListener('request-logout-confirm', requestLogout)
 })
 </script>
 
@@ -167,8 +210,8 @@ onBeforeUnmount(() => {
   z-index: 60;
 }
 .mascot-button {
-  width: 56px;
-  height: 56px;
+  width: 80px;
+  height: 80px;
   border-radius: 9999px;
   overflow: hidden;
   box-shadow: 0 6px 20px rgba(0,0,0,0.12);
@@ -193,7 +236,7 @@ onBeforeUnmount(() => {
 /* Persistent badge next to mascot */
 .mascot-badge {
   position: absolute;
-  right: 74px;
+  right: 98px;
   bottom: 10px;
   background: linear-gradient(90deg,#7c3aed,#f59e0b);
   color: #fff;
@@ -209,11 +252,21 @@ onBeforeUnmount(() => {
 .mascot-badge:hover { transform: translateY(-2px) }
 
 @media (max-width: 480px) {
-  .mascot-badge { right: 64px; font-size: 0.72rem; padding: 0.26rem 0.5rem }
+  .mascot-badge { right: 88px; font-size: 0.72rem; padding: 0.26rem 0.5rem }
 }
 
 @media (min-width: 768px) {
   .mascot-wrapper { right: 1.5rem; bottom: 1.5rem }
+}
+
+/* Modal mascot pop animation */
+@keyframes mascot-pop {
+  0% { transform: scale(0.85); opacity: 0 }
+  60% { transform: scale(1.05); opacity: 1 }
+  100% { transform: scale(1); opacity: 1 }
+}
+.mascot-modal-img {
+  animation: mascot-pop 260ms cubic-bezier(.2,.9,.3,1);
 }
 
 </style>

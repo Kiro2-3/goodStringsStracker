@@ -21,8 +21,7 @@
     <form class="chat-input" @submit.prevent="send">
       <input
         v-model="input"
-        :placeholder="loading ? 'Thinking...' : 'Or type a question...'
-        "
+        :placeholder="loading ? 'Thinking...' : ''"
         @keydown.enter.exact.prevent="send"
         :disabled="loading"
       />
@@ -40,6 +39,27 @@ const messages = ref([
 const input = ref('')
 const loading = ref(false)
 const messagesRef = ref(null)
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
+
+async function typeWrite(text, msgIndex, speed = 20) {
+  if (!text || typeof text !== 'string') {
+    messages.value[msgIndex].text = String(text || '')
+    return
+  }
+  messages.value[msgIndex].text = ''
+  for (let i = 0; i < text.length; i++) {
+    messages.value[msgIndex].text += text[i]
+    scrollBottom()
+    // small pause to simulate typing
+    // slight longer pause on punctuation for realism
+    const ch = text[i]
+    const extra = /[.,!?]/.test(ch) ? speed * 6 : 0
+    await sleep(speed + extra)
+  }
+}
 
 function scrollBottom() {
   nextTick(() => {
@@ -76,13 +96,19 @@ async function send() {
     }
 
     const data = await res.json()
-    // replace the last ai placeholder with real reply
+    // replace the last ai placeholder with a typewriter effect
     for (let i = messages.value.length - 1; i >= 0; i--) {
-      if (messages.value[i].from === 'ai') { messages.value[i].text = data.message; break }
+      if (messages.value[i].from === 'ai') {
+        await typeWrite(data.message, i)
+        break
+      }
     }
   } catch (e) {
     for (let i = messages.value.length - 1; i >= 0; i--) {
-      if (messages.value[i].from === 'ai') { messages.value[i].text = 'Sorry, I could not fetch a response.'; break }
+      if (messages.value[i].from === 'ai') {
+        await typeWrite('Sorry, I could not fetch a response.', i)
+        break
+      }
     }
   } finally {
     loading.value = false
@@ -96,8 +122,12 @@ function choose(key) {
   messages.value.push({ from: 'user', text: choice.label })
   // Compose reply from steps
   const reply = choice.steps.join('\n')
-  messages.value.push({ from: 'ai', text: reply })
+  // push placeholder ai message and type it out
+  messages.value.push({ from: 'ai', text: '...' })
   scrollBottom()
+  const aiIndex = messages.value.length - 1
+  // fire-and-forget typing (no loading state for quick choices)
+  typeWrite(reply, aiIndex, 16)
 }
 
 const choices = [
@@ -178,8 +208,14 @@ scrollBottom()
 .chat-message.user { justify-content: flex-end }
 .chat-message.ai { justify-content: flex-start }
 .chat-text { padding: 0.5rem 0.68rem; border-radius: 10px; max-width: 80%; line-height:1.25; white-space:pre-wrap }
-.chat-message.user .chat-text { background: linear-gradient(90deg,#eef2ff,#e9d5ff); color:#111827 }
-.chat-message.ai .chat-text { background: linear-gradient(90deg,#fafafa,#f3f0ff); color:#0b1220 }
+.chat-message.user .chat-text {
+  background: linear-gradient(90deg,#4f46e5,#7c3aed); /* stronger primary gradient for user messages */
+  color: #ffffff;
+}
+.chat-message.ai .chat-text {
+  background: linear-gradient(90deg,#f1f5f9,#e2e8f0); /* light neutral for assistant */
+  color: #0f172a;
+}
 .chat-input { display:flex; gap:0.5rem; padding: 0.5rem; border-top: 1px solid rgba(2,6,23,0.05) }
 .chat-input input { flex:1; padding:0.45rem 0.6rem; border-radius:8px; border:1px solid #e6e6e9 }
 
@@ -187,5 +223,14 @@ scrollBottom()
   .chatbot-root { background: rgba(8,10,18,0.9); color: #e6eef8 }
   .chat-text { color: #e6eef8 }
   .choice { background: rgba(255,255,255,0.03) }
+  .chat-message.user .chat-text {
+    background: linear-gradient(90deg,#3730a3,#7c3aed);
+    color: #ffffff;
+  }
+  .chat-message.ai .chat-text {
+    background: linear-gradient(90deg,#0b1220,#172554);
+    color: #e6eef8;
+  }
+  .chat-input input { background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.08); color: #e6eef8 }
 }
 </style>

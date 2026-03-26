@@ -50,6 +50,8 @@ class BankAccountController
             'auth' => ['user' => $user],
             'bankAccounts' => $bankAccounts,
             'totalBalance' => $totalBalance,
+            // Upcoming recurring payments placeholder - populated by backend when feature implemented
+            'upcomingRecurring' => [],
         ]);
     }
 

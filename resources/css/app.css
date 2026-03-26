@@ -6,3 +6,20 @@
 body {
 	@apply text-primaryPurple;
 }
+
+/* Stronger card shadows across the app for better elevation */
+.card {
+	box-shadow: 0 12px 30px rgba(2,6,23,0.18), 0 4px 10px rgba(2,6,23,0.06);
+	transition: box-shadow 180ms ease, transform 180ms ease;
+}
+
+/* Slightly deeper shadow on hover/focus for emphasis */
+.card:hover, .card:focus-within {
+	box-shadow: 0 18px 48px rgba(2,6,23,0.22), 0 6px 18px rgba(2,6,23,0.08);
+}
+
+/* Dark mode card shadow */
+.dark .card {
+	box-shadow: 0 12px 30px rgba(0,0,0,0.6), 0 4px 12px rgba(0,0,0,0.4);
+}
+

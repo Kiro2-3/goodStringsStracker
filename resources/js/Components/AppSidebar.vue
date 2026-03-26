@@ -2,7 +2,7 @@
   <!-- ===================== MOBILE ===================== -->
 
   <!-- Mobile top navbar (visible only below md breakpoint) -->
-  <div class="md:hidden fixed top-0 left-0 right-0 z-30 bg-base-100 border-b border-base-200 shadow-sm flex items-center justify-between px-4 py-3">
+  <div class="md:hidden fixed top-0 left-0 right-0 z-30 bg-base-100 mobile-header-gradient border-b border-base-200 shadow-sm flex items-center justify-between px-4 py-3">
     <div class="flex items-center gap-2">
       <img src="/public/images/str.png" alt="Stracker Logo" class="h-7 w-auto" />
       <span class="font-bold text-base tracking-tight text-base-content">Stracker</span>
@@ -146,7 +146,7 @@
     - Uses CSS transition on width + opacity for smooth animation
   -->
   <aside
-    class="hidden md:flex md:flex-col md:min-h-screen bg-base-100 border-r border-base-200 sticky top-0 z-20 shadow-md overflow-hidden transition-all duration-300 ease-in-out h-screen overflow-y-auto"
+    class="hidden md:flex md:flex-col md:min-h-screen bg-base-100 border-r border-base-200 sticky top-0 z-20 shadow-md overflow-hidden transition-all duration-300 ease-in-out h-screen overflow-y-auto sidebar-gradient"
     :style="{ width: desktopOpen ? '16rem' : '4rem' }"
     @mouseenter="desktopOpen = true"
     @mouseleave="desktopOpen = false"
@@ -349,3 +349,12 @@ const mobileOpen = ref(false);
 // Desktop: sidebar starts collapsed (icon-only); expands to full width on hover
 const desktopOpen = ref(false);
 </script>
+<style scoped>
+.sidebar-gradient {
+  background-image: linear-gradient(180deg, rgba(124,58,237,0.03), rgba(245,158,11,0.03));
+}
+
+.mobile-header-gradient {
+  background-image: linear-gradient(90deg, rgba(124,58,237,0.04), rgba(245,158,11,0.04));
+}
+</style>
